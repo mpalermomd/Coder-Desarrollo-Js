@@ -8,6 +8,14 @@
 </head>
 <body>
   <h1>Resultados de Partidos</h1>
+  
+  <!-- Botones de filtro -->
+  <div class="filter-buttons">
+    <button class="btn" onclick="filtrarPartidos('todos')">Todos</button>
+    <button class="btn" onclick="filtrarPartidos('equipo1')">Equipo 1</button>
+    <button class="btn" onclick="filtrarPartidos('equipo2')">Equipo 2</button>
+  </div>
+
   <div class="form-container">
     <h2>Agregar nuevo partido</h2>
     <input type="text" id="equipo1" placeholder="Equipo 1" required>
@@ -19,7 +27,9 @@
     <input type="number" id="fairPlay" placeholder="Fair Play (1-10)" min="1" max="10" required>
     <button onclick="agregarPartido()">Agregar Partido</button>
   </div>
+
   <div class="card-container" id="resultados"></div>
+
   <script src="script.js"></script>
 </body>
 </html>
