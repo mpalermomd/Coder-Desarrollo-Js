@@ -11,10 +11,14 @@
 
   <!-- Filtros -->
   <div class="filter-container">
-    <input type="text" id="filtroGoleador" placeholder="Filtrar por goleador">
-    <input type="text" id="filtroResultado" placeholder="Filtrar por resultado (ej. 2-1)">
-    <input type="text" id="filtroAmarillas" placeholder="Filtrar por jugador con amarilla">
-    <input type="text" id="filtroRojas" placeholder="Filtrar por jugador con roja">
+    <select id="filtroCategoria">
+      <option value="goleadores">Filtrar por Goleadores</option>
+      <option value="resultado">Filtrar por Resultado</option>
+      <option value="amarillas">Filtrar por Tarjetas Amarillas</option>
+      <option value="rojas">Filtrar por Tarjetas Rojas</option>
+      <option value="equipo">Filtrar por Equipo</option>
+    </select>
+    <input type="text" id="filtroInput" placeholder="Filtrar..." />
     <button onclick="aplicarFiltros()">Filtrar</button>
     <button onclick="resetFiltros()">Restablecer</button>
   </div>
@@ -24,9 +28,9 @@
     <input type="text" id="equipo1" placeholder="Equipo 1" required>
     <input type="text" id="equipo2" placeholder="Equipo 2" required>
     <input type="text" id="resultado" placeholder="Resultado (ej. 2 - 1)" required>
-    <input type="text" id="goleadores" placeholder="Goleadores (nombre - equipo)" required>
-    <input type="text" id="jugadoresAmarillas" placeholder="Jugadores con amarillas (nombre - equipo)" required>
-    <input type="text" id="jugadoresRojas" placeholder="Jugadores con rojas (nombre - equipo)" required>
+    <input type="text" id="goleadores" placeholder="Goleadores (separados por coma)" required>
+    <input type="text" id="amarillas" placeholder="Jugadores con amarillas (separados por coma)" required>
+    <input type="text" id="rojas" placeholder="Jugadores con rojas (separados por coma)" required>
     <button onclick="agregarPartido()">Agregar Partido</button>
   </div>
 

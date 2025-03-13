@@ -203,3 +203,51 @@ h1 {
   background-color: #d4edda !important;
   border: 2px solid #28a745;
 }
+.ganador {
+  background-color: #d4edda !important;
+  border: 2px solid #28a745;
+}
+
+.filter-container {
+  margin-bottom: 20px;
+}
+
+.filter-container select,
+.filter-container input {
+  padding: 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  width: 90%;
+  max-width: 1200px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.card h2 {
+  margin: 0 0 10px;
+  color: #444;
+}
+
+.stat {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.highlight {
+  font-weight: bold;
+  color: #000;
+}

@@ -8,24 +8,34 @@ function mostrarResultados(filtros = {}) {
     let mostrar = true;
 
     // Aplicar filtros
-    if (filtros.goleador && !partido.goleadores.includes(filtros.goleador)) {
-      mostrar = false;
-    }
-    if (filtros.resultado && partido.resultado !== filtros.resultado) {
-      mostrar = false;
-    }
-    if (filtros.amarillas && !partido.amarillas.includes(filtros.amarillas)) {
-      mostrar = false;
-    }
-    if (filtros.rojas && !partido.rojas.includes(filtros.rojas)) {
-      mostrar = false;
+    if (filtros.filtroCategoria && filtros.filtroInput) {
+      const filtroInput = filtros.filtroInput.toLowerCase();
+
+      if (filtros.filtroCategoria === "goleadores" && !partido.goleadores.some(g => g.toLowerCase().includes(filtroInput))) {
+        mostrar = false;
+      }
+
+      if (filtros.filtroCategoria === "resultado" && !partido.resultado.includes(filtroInput)) {
+        mostrar = false;
+      }
+
+      if (filtros.filtroCategoria === "amarillas" && !partido.amarillas.some(a => a.toLowerCase().includes(filtroInput))) {
+        mostrar = false;
+      }
+
+      if (filtros.filtroCategoria === "rojas" && !partido.rojas.some(r => r.toLowerCase().includes(filtroInput))) {
+        mostrar = false;
+      }
+
+      if (filtros.filtroCategoria === "equipo" && !(partido.equipo1.toLowerCase().includes(filtroInput) || partido.equipo2.toLowerCase().includes(filtroInput))) {
+        mostrar = false;
+      }
     }
 
     if (mostrar) {
       const card = document.createElement('div');
       card.classList.add('card');
 
-      // Determinar equipo ganador
       const [goles1, goles2] = partido.resultado.split('-').map(num => parseInt(num.trim()));
       let equipoGanador = null;
       if (goles1 > goles2) equipoGanador = partido.equipo1;
@@ -40,7 +50,10 @@ function mostrarResultados(filtros = {}) {
       card.innerHTML = `
         <h2>${partido.equipo1} vs ${partido.equipo2}</h2>
         <p><strong>Resultado:</strong> ${partido.resultado}</p>
-        <p><strong>Goleadores:</strong> ${partido.goleadores.join(', ') || 'Ninguno'}</p>
+        <p><strong>Goles del equipo 1:</strong> ${partido.goles1.join(', ')}</p>
+        <p><strong>Goleadores del equipo 1:</strong> ${partido.goleadores1.join(', ')}</p>
+        <p><strong>Goles del equipo 2:</strong> ${partido.goles2.join(', ')}</p>
+        <p><strong>Goleadores del equipo 2:</strong> ${partido.goleadores2.join(', ')}</p>
         <p><strong>Amarillas:</strong> ${partido.amarillas.join(', ') || 'Ninguno'}</p>
         <p><strong>Rojas:</strong> ${partido.rojas.join(', ') || 'Ninguno'}</p>
         <button onclick="editarPartido(${index})">Editar</button>
@@ -56,16 +69,23 @@ function agregarPartido() {
   const equipo1 = document.getElementById('equipo1').value;
   const equipo2 = document.getElementById('equipo2').value;
   const resultado = document.getElementById('resultado').value;
-  const goleadores = document.getElementById('goleadores').value.split(',').map(g => g.trim());
-  const amarillas = document.getElementById('jugadoresAmarillas').value.split(',').map(a => a.trim());
-  const rojas = document.getElementById('jugadoresRojas').value.split(',').map(r => r.trim());
+  const goles1 = document.getElementById('goleadores').value.split(',').map(g => g.trim());
+  const goleadores1 = goles1.slice(0, goles1.length / 2);
+  const goles2 = goles1.slice(goles1.length / 2);
+  const goleadores2 = goles1.slice(goleadores1.length);
+
+  const amarillas = document.getElementById('amarillas').value.split(',').map(a => a.trim());
+  const rojas = document.getElementById('rojas').value.split(',').map(r => r.trim());
 
   if (equipo1 && equipo2 && resultado) {
     partidos.push({
       equipo1,
       equipo2,
       resultado,
-      goleadores,
+      goles1,
+      goleadores1,
+      goles2,
+      goleadores2,
       amarillas,
       rojas
     });
@@ -78,42 +98,18 @@ function agregarPartido() {
   }
 }
 
-function editarPartido(index) {
-  const partido = partidos[index];
-
-  const nuevoGoleadores = prompt("Editar goleadores:", partido.goleadores.join(', '));
-  const nuevoAmarillas = prompt("Editar jugadores con amarilla:", partido.amarillas.join(', '));
-  const nuevoRojas = prompt("Editar jugadores con roja:", partido.rojas.join(', '));
-
-  if (nuevoGoleadores !== null) partido.goleadores = nuevoGoleadores.split(',').map(g => g.trim());
-  if (nuevoAmarillas !== null) partido.amarillas = nuevoAmarillas.split(',').map(a => a.trim());
-  if (nuevoRojas !== null) partido.rojas = nuevoRojas.split(',').map(r => r.trim());
-
-  localStorage.setItem('partidos', JSON.stringify(partidos));
-  mostrarResultados();
-}
-
-function eliminarPartido(index) {
-  if (confirm("¿Seguro que deseas eliminar este partido?")) {
-    partidos.splice(index, 1);
-    localStorage.setItem('partidos', JSON.stringify(partidos));
-    mostrarResultados();
-  }
-}
-
 function aplicarFiltros() {
-  const filtros = {
-    goleador: document.getElementById('filtroGoleador').value.trim(),
-    resultado: document.getElementById('filtroResultado').value.trim(),
-    amarillas: document.getElementById('filtroAmarillas').value.trim(),
-    rojas: document.getElementById('filtroRojas').value.trim(),
-  };
+  const categoria = document.getElementById('filtroCategoria').value;
+  const input = document.getElementById('filtroInput').value;
 
-  mostrarResultados(filtros);
+  mostrarResultados({
+    filtroCategoria: categoria,
+    filtroInput: input
+  });
 }
 
 function resetFiltros() {
-  document.querySelectorAll('.filter-container input').forEach(input => input.value = '');
+  document.getElementById('filtroInput').value = '';
   mostrarResultados();
 }
 
