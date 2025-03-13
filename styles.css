@@ -199,3 +199,7 @@ h1 {
 .btn:hover {
   background-color: #0056b3;
 }
+.ganador {
+  background-color: #d4edda !important;
+  border: 2px solid #28a745;
+}

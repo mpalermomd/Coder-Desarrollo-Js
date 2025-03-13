@@ -1,32 +1,49 @@
-/**
-* Objetivos: 
-*-Usar variables 
-*-Usar array 
-*-Usar funciones 
-*-Usar algún ciclo 
-* */
-
-
 const partidos = JSON.parse(localStorage.getItem('partidos')) || [];
 
-function mostrarResultados(filtro = 'todos') {
+function mostrarResultados(filtros = {}) {
   const contenedor = document.getElementById('resultados');
   contenedor.innerHTML = "";
 
   partidos.forEach((partido, index) => {
-    if (filtro === 'todos' || partido.equipo1 === filtro || partido.equipo2 === filtro) {
+    let mostrar = true;
+
+    // Aplicar filtros
+    if (filtros.goleador && !partido.goleadores.includes(filtros.goleador)) {
+      mostrar = false;
+    }
+    if (filtros.resultado && partido.resultado !== filtros.resultado) {
+      mostrar = false;
+    }
+    if (filtros.amarillas && !partido.amarillas.includes(filtros.amarillas)) {
+      mostrar = false;
+    }
+    if (filtros.rojas && !partido.rojas.includes(filtros.rojas)) {
+      mostrar = false;
+    }
+
+    if (mostrar) {
       const card = document.createElement('div');
       card.classList.add('card');
-      card.setAttribute('data-equipo1', partido.equipo1);
-      card.setAttribute('data-equipo2', partido.equipo2);
+
+      // Determinar equipo ganador
+      const [goles1, goles2] = partido.resultado.split('-').map(num => parseInt(num.trim()));
+      let equipoGanador = null;
+      if (goles1 > goles2) equipoGanador = partido.equipo1;
+      else if (goles2 > goles1) equipoGanador = partido.equipo2;
+
+      if (equipoGanador) {
+        if (equipoGanador === partido.equipo1) {
+          card.classList.add('ganador');
+        }
+      }
 
       card.innerHTML = `
         <h2>${partido.equipo1} vs ${partido.equipo2}</h2>
-        <p class="stat"><span class="highlight">Resultado:</span> ${partido.resultado}</p>
-        <p class="stat"><span class="highlight">Goleadores:</span> ${partido.goleadores.length > 0 ? partido.goleadores.join(', ') : 'Ninguno'}</p>
-        <p class="stat"><span class="highlight">Tarjetas Amarillas:</span> ${partido.tarjetas.amarillas}</p>
-        <p class="stat"><span class="highlight">Tarjetas Rojas:</span> ${partido.tarjetas.rojas}</p>
-        <p class="stat"><span class="highlight">Fair Play:</span> ${partido.fairPlay}/10</p>
+        <p><strong>Resultado:</strong> ${partido.resultado}</p>
+        <p><strong>Goleadores:</strong> ${partido.goleadores.join(', ') || 'Ninguno'}</p>
+        <p><strong>Amarillas:</strong> ${partido.amarillas.join(', ') || 'Ninguno'}</p>
+        <p><strong>Rojas:</strong> ${partido.rojas.join(', ') || 'Ninguno'}</p>
+        <button onclick="editarPartido(${index})">Editar</button>
         <button class="btn-eliminar" onclick="eliminarPartido(${index})">Eliminar</button>
       `;
 
@@ -39,56 +56,65 @@ function agregarPartido() {
   const equipo1 = document.getElementById('equipo1').value;
   const equipo2 = document.getElementById('equipo2').value;
   const resultado = document.getElementById('resultado').value;
-  const goleadores = document.getElementById('goleadores').value.split(',').map(g => g.trim()).filter(g => g);
-  const amarillas = parseInt(document.getElementById('amarillas').value);
-  const rojas = parseInt(document.getElementById('rojas').value);
-  const fairPlay = parseInt(document.getElementById('fairPlay').value);
+  const goleadores = document.getElementById('goleadores').value.split(',').map(g => g.trim());
+  const amarillas = document.getElementById('jugadoresAmarillas').value.split(',').map(a => a.trim());
+  const rojas = document.getElementById('jugadoresRojas').value.split(',').map(r => r.trim());
 
-  if (equipo1 && equipo2 && resultado && !isNaN(amarillas) && !isNaN(rojas) && !isNaN(fairPlay)) {
+  if (equipo1 && equipo2 && resultado) {
     partidos.push({
       equipo1,
       equipo2,
       resultado,
       goleadores,
-      tarjetas: { amarillas, rojas },
-      fairPlay
+      amarillas,
+      rojas
     });
 
     localStorage.setItem('partidos', JSON.stringify(partidos));
     mostrarResultados();
     document.querySelectorAll('.form-container input').forEach(input => input.value = '');
-    mostrarMensaje("¡Carga realizada con éxito!");
   } else {
-    alert('Por favor, complete todos los campos correctamente.');
+    alert('Por favor, complete todos los campos.');
   }
+}
+
+function editarPartido(index) {
+  const partido = partidos[index];
+
+  const nuevoGoleadores = prompt("Editar goleadores:", partido.goleadores.join(', '));
+  const nuevoAmarillas = prompt("Editar jugadores con amarilla:", partido.amarillas.join(', '));
+  const nuevoRojas = prompt("Editar jugadores con roja:", partido.rojas.join(', '));
+
+  if (nuevoGoleadores !== null) partido.goleadores = nuevoGoleadores.split(',').map(g => g.trim());
+  if (nuevoAmarillas !== null) partido.amarillas = nuevoAmarillas.split(',').map(a => a.trim());
+  if (nuevoRojas !== null) partido.rojas = nuevoRojas.split(',').map(r => r.trim());
+
+  localStorage.setItem('partidos', JSON.stringify(partidos));
+  mostrarResultados();
 }
 
 function eliminarPartido(index) {
-  if (confirm("¿Estás seguro de que querés eliminar este partido?")) {
+  if (confirm("¿Seguro que deseas eliminar este partido?")) {
     partidos.splice(index, 1);
     localStorage.setItem('partidos', JSON.stringify(partidos));
     mostrarResultados();
-    mostrarMensaje("Partido eliminado correctamente.");
   }
 }
 
-function filtrarPartidos(categoria) {
-  if (categoria === 'todos') {
-    mostrarResultados();
-  } else {
-    mostrarResultados(categoria);
-  }
+function aplicarFiltros() {
+  const filtros = {
+    goleador: document.getElementById('filtroGoleador').value.trim(),
+    resultado: document.getElementById('filtroResultado').value.trim(),
+    amarillas: document.getElementById('filtroAmarillas').value.trim(),
+    rojas: document.getElementById('filtroRojas').value.trim(),
+  };
+
+  mostrarResultados(filtros);
 }
 
-function mostrarMensaje(mensaje) {
-  const mensajeDiv = document.createElement('div');
-  mensajeDiv.classList.add('mensaje-exito');
-  mensajeDiv.textContent = mensaje;
-  document.body.appendChild(mensajeDiv);
-
-  setTimeout(() => {
-    mensajeDiv.remove();
-  }, 3000);
+function resetFiltros() {
+  document.querySelectorAll('.filter-container input').forEach(input => input.value = '');
+  mostrarResultados();
 }
 
 mostrarResultados();
