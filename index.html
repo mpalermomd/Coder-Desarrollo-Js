@@ -8,34 +8,18 @@
 </head>
 <body>
   <h1>Resultados de Partidos</h1>
-
-  <!-- Filtros -->
-  <div class="filter-container">
-    <select id="filtroCategoria">
-      <option value="goleadores">Filtrar por Goleadores</option>
-      <option value="resultado">Filtrar por Resultado</option>
-      <option value="amarillas">Filtrar por Tarjetas Amarillas</option>
-      <option value="rojas">Filtrar por Tarjetas Rojas</option>
-      <option value="equipo">Filtrar por Equipo</option>
-    </select>
-    <input type="text" id="filtroInput" placeholder="Filtrar..." />
-    <button onclick="aplicarFiltros()">Filtrar</button>
-    <button onclick="resetFiltros()">Restablecer</button>
-  </div>
-
   <div class="form-container">
     <h2>Agregar nuevo partido</h2>
     <input type="text" id="equipo1" placeholder="Equipo 1" required>
     <input type="text" id="equipo2" placeholder="Equipo 2" required>
-    <input type="text" id="resultado" placeholder="Resultado (ej. 2 - 1)" required>
-    <input type="text" id="goleadores" placeholder="Goleadores (separados por coma)" required>
-    <input type="text" id="amarillas" placeholder="Jugadores con amarillas (separados por coma)" required>
-    <input type="text" id="rojas" placeholder="Jugadores con rojas (separados por coma)" required>
+    <input type="text" id="resultado" placeholder="Resultado (e.g., 2 - 1)" required>
+    <input type="text" id="goleadores" placeholder="Goleadores (separados por comas)" required>
+    <input type="number" id="amarillas" placeholder="Tarjetas Amarillas" min="0" required>
+    <input type="number" id="rojas" placeholder="Tarjetas Rojas" min="0" required>
+    <input type="number" id="fairPlay" placeholder="Fair Play (1-10)" min="1" max="10" required>
     <button onclick="agregarPartido()">Agregar Partido</button>
   </div>
-
   <div class="card-container" id="resultados"></div>
-
   <script src="script.js"></script>
 </body>
 </html>
