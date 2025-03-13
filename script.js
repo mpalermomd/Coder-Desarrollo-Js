@@ -15,9 +15,15 @@ function mostrarResultados() {
   partidos.forEach((partido, index) => {
     const card = document.createElement('div');
     card.classList.add('card');
-    card.innerHTML = 
-      <><h2>${partido.equipo1} vs ${partido.equipo2}</h2><p class="stat"><span class="highlight">Resultado:</span> ${partido.resultado}</p><p class="stat"><span class="highlight">Goleadores:</span> ${partido.goleadores.length > 0 ? partido.goleadores.join(', ') : 'Ninguno'}</p><p class="stat"><span class="highlight">Tarjetas Amarillas:</span> ${partido.tarjetas.amarillas}</p><p class="stat"><span class="highlight">Tarjetas Rojas:</span> ${partido.tarjetas.rojas}</p><p class="stat"><span class="highlight">Fair Play:</span> ${partido.fairPlay}/10</p><button class="btn-eliminar" onclick="eliminarPartido(${index})">Eliminar</button></>
-    ;
+    card.innerHTML = `
+      <h2>${partido.equipo1} vs ${partido.equipo2}</h2>
+      <p class="stat"><span class="highlight">Resultado:</span> ${partido.resultado}</p>
+      <p class="stat"><span class="highlight">Goleadores:</span> ${partido.goleadores.length > 0 ? partido.goleadores.join(', ') : 'Ninguno'}</p>
+      <p class="stat"><span class="highlight">Tarjetas Amarillas:</span> ${partido.tarjetas.amarillas}</p>
+      <p class="stat"><span class="highlight">Tarjetas Rojas:</span> ${partido.tarjetas.rojas}</p>
+      <p class="stat"><span class="highlight">Fair Play:</span> ${partido.fairPlay}/10</p>
+      <button class="btn-eliminar" onclick="eliminarPartido(${index})">Eliminar</button>
+    `;
     contenedor.appendChild(card);
   });
 }
