@@ -17,14 +17,12 @@
     <input type="date" id="fecha">
     <select id="equipo1" class="select-equipo"></select>
     <select id="equipo2" class="select-equipo"></select>
-    <input type="text" id="resultado" placeholder="Resultado (Ej: 2-1)">
-    <button onclick="agregarPartido()">Agregar Partido</button>
-
-    <h2>Goleadores</h2>
+    <input type="text" id="resultado" placeholder="Ej: 2-1">
     <div id="goleadores-container"></div>
     <button onclick="agregarGoleador()">+ Agregar Goleador</button>
+    <button onclick="agregarPartido()">Agregar Partido</button>
 
-    <h2>Fechas disponibles</h2>
+    <h2>Filtrar por Fecha</h2>
     <select id="filtroFecha" onchange="filtrarPorFecha()">
         <option value="">Mostrar todas</option>
     </select>
@@ -32,9 +30,13 @@
     <h2>Resultados</h2>
     <div id="resultados"></div>
 
+    <h2>Goleadores por Fecha</h2>
+    <div id="goleadoresFecha"></div>
+
     <h2>Tabla de Posiciones</h2>
     <div id="tablaPosiciones"></div>
 
     <script src="script.js"></script>
 </body>
 </html>
+

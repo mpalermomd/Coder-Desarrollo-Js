@@ -7,12 +7,10 @@
 * */
 
 
-
-// Recuperar datos almacenados o inicializar vacíos
 const equipos = JSON.parse(localStorage.getItem('equipos')) || [];
 const partidos = JSON.parse(localStorage.getItem('partidos')) || [];
 
-// Actualizar los select de equipos dinámicamente
+// Actualiza los select de equipos dinámicamente
 function actualizarSelectEquipos() {
     document.querySelectorAll('.select-equipo').forEach(select => {
         select.innerHTML = '<option value="">Seleccione equipo</option>';
@@ -29,7 +27,6 @@ function agregarEquipo() {
         equipos.push(nombreEquipo);
         localStorage.setItem('equipos', JSON.stringify(equipos));
         actualizarSelectEquipos();
-        mostrarMensaje("¡Equipo agregado con éxito!");
     } else {
         alert("Ingrese un nombre válido y no repetido.");
     }
@@ -41,23 +38,18 @@ function mostrarResultados(filtrados = partidos) {
     const contenedor = document.getElementById('resultados');
     contenedor.innerHTML = ""; 
 
-    filtrados.forEach((partido, index) => {
+    filtrados.forEach(partido => {
         const card = document.createElement('div');
         card.classList.add('card');
         card.innerHTML = `
             <h2>${partido.fecha} - ${partido.equipo1} vs ${partido.equipo2}</h2>
             <p><strong>Resultado:</strong> ${partido.resultado}</p>
-            <p><strong>Goleadores:</strong> ${
-                partido.goleadores.length > 0 
-                    ? partido.goleadores.map(g => `${g.nombre} (${g.equipo}, ${g.goles} goles)`).join(', ') 
-                    : 'Ninguno'
-            }</p>
-            <button onclick="eliminarPartido(${index})">Eliminar</button>
         `;
         contenedor.appendChild(card);
     });
 
     actualizarFechasDisponibles();
+    mostrarGoleadoresPorFecha();
 }
 
 // Agregar un partido
@@ -88,7 +80,6 @@ function agregarPartido() {
 
     mostrarResultados();
     mostrarTablaPosiciones();
-    mostrarMensaje("¡Partido agregado con éxito!");
 }
 
 // Agregar un goleador
@@ -105,22 +96,28 @@ function agregarGoleador() {
     actualizarSelectEquipos();
 }
 
+// Mostrar los goleadores por fecha
+function mostrarGoleadoresPorFecha() {
+    const fecha = document.getElementById('filtroFecha').value;
+    const filtrados = fecha ? partidos.filter(p => p.fecha === fecha) : partidos;
+
+    const contenedor = document.getElementById('goleadoresFecha');
+    contenedor.innerHTML = "<h3>Goleadores</h3>";
+
+    filtrados.forEach(partido => {
+        partido.goleadores.forEach(goleador => {
+            contenedor.innerHTML += `<p>${goleador.nombre} (${goleador.equipo}): ${goleador.goles} goles</p>`;
+        });
+    });
+}
+
 // Filtrar por fecha
 function filtrarPorFecha() {
     const fecha = document.getElementById('filtroFecha').value;
     const filtrados = fecha ? partidos.filter(p => p.fecha === fecha) : partidos;
     mostrarResultados(filtrados);
+    mostrarGoleadoresPorFecha();
     mostrarTablaPosiciones();
-}
-
-// Actualizar las fechas disponibles para filtrar
-function actualizarFechasDisponibles() {
-    const filtroFecha = document.getElementById('filtroFecha');
-    filtroFecha.innerHTML = '<option value="">Mostrar todas</option>';
-    const fechasUnicas = [...new Set(partidos.map(p => p.fecha))];
-    fechasUnicas.forEach(fecha => {
-        filtroFecha.innerHTML += `<option value="${fecha}">${fecha}</option>`;
-    });
 }
 
 // Mostrar tabla de posiciones
