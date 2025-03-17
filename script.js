@@ -10,7 +10,7 @@
 const equipos = JSON.parse(localStorage.getItem('equipos')) || [];
 const partidos = JSON.parse(localStorage.getItem('partidos')) || [];
 
-// Actualiza los select de equipos dinámicamente
+// Actualizar los select de equipos dinámicamente
 function actualizarSelectEquipos() {
     document.querySelectorAll('.select-equipo').forEach(select => {
         select.innerHTML = '<option value="">Seleccione equipo</option>';
@@ -44,6 +44,7 @@ function mostrarResultados(filtrados = partidos) {
         card.innerHTML = `
             <h2>${partido.fecha} - ${partido.equipo1} vs ${partido.equipo2}</h2>
             <p><strong>Resultado:</strong> ${partido.resultado}</p>
+            <p><strong>Goleadores:</strong> ${partido.goleadores.map(g => `${g.nombre} (${g.equipo}) - ${g.goles} goles`).join(', ') || 'Ninguno'}</p>
         `;
         contenedor.appendChild(card);
     });
