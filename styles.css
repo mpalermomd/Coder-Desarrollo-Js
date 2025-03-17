@@ -13,7 +13,7 @@ h1 {
   color: #333;
 }
 
-.form-container, .filters {
+.form-container, .filtros {
   margin-bottom: 20px;
   padding: 20px;
   background: #fff;
@@ -24,9 +24,9 @@ h1 {
 }
 
 .form-container input,
-.filters input,
+.filtros input,
 .form-container button,
-.filters button {
+.filtros button {
   width: 100%;
   padding: 10px;
   margin: 10px 0;
@@ -79,6 +79,21 @@ h1 {
 
 .btn-eliminar:hover {
   background-color: #d32f2f;
+}
+
+.tabla-container {
+  margin-top: 20px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 600px;
+  text-align: center;
+}
+
+.tabla-container h3 {
+  margin-bottom: 10px;
 }
 
 .mensaje-exito {

@@ -8,33 +8,29 @@
 </head>
 <body>
   <h1>Resultados de Partidos</h1>
-  
+
   <div class="form-container">
     <h2>Agregar nuevo partido</h2>
     <input type="date" id="fecha" required>
     <input type="text" id="equipo1" placeholder="Equipo 1" required>
     <input type="text" id="equipo2" placeholder="Equipo 2" required>
     <input type="text" id="resultado" placeholder="Resultado (e.g., 2 - 1)" required>
-    <input type="text" id="goleadores" placeholder="Goleadores (separados por comas)" required>
+    <input type="text" id="goleadores" placeholder="Goleadores (Nombre - Equipo, separados por comas)" required>
     <input type="number" id="amarillas" placeholder="Tarjetas Amarillas" min="0" required>
     <input type="number" id="rojas" placeholder="Tarjetas Rojas" min="0" required>
     <input type="number" id="fairPlay" placeholder="Fair Play (1-10)" min="1" max="10" required>
     <button onclick="agregarPartido()">Agregar Partido</button>
   </div>
 
-  <div class="filters">
+  <div class="filtros">
+    <h2>Filtrar Resultados</h2>
     <input type="date" id="filtroFecha">
     <button onclick="filtrarPorFecha()">Filtrar por Fecha</button>
-    
-    <input type="text" id="filtroGoleador" placeholder="Buscar Goleador">
-    <button onclick="filtrarPorGoleador()">Filtrar por Goleador</button>
   </div>
 
-  <h2>Tabla de Posiciones</h2>
-  <div id="tablaPosiciones"></div>
-
-  <h2>Resultados</h2>
   <div class="card-container" id="resultados"></div>
+
+  <div id="tablaPosiciones" class="tabla-container"></div>
 
   <script src="script.js"></script>
 </body>
