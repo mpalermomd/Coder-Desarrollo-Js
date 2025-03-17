@@ -9,14 +9,15 @@
 
 const partidos = JSON.parse(localStorage.getItem('partidos')) || [];
 
-function mostrarResultados() {
+function mostrarResultados(filtrados = partidos) {
   const contenedor = document.getElementById('resultados');
   contenedor.innerHTML = "";
-  partidos.forEach((partido, index) => {
+  
+  filtrados.forEach((partido, index) => {
     const card = document.createElement('div');
     card.classList.add('card');
     card.innerHTML = `
-      <h2>${partido.equipo1} vs ${partido.equipo2}</h2>
+      <h2>${partido.fecha} - ${partido.equipo1} vs ${partido.equipo2}</h2>
       <p class="stat"><span class="highlight">Resultado:</span> ${partido.resultado}</p>
       <p class="stat"><span class="highlight">Goleadores:</span> ${partido.goleadores.length > 0 ? partido.goleadores.join(', ') : 'Ninguno'}</p>
       <p class="stat"><span class="highlight">Tarjetas Amarillas:</span> ${partido.tarjetas.amarillas}</p>
@@ -29,51 +30,41 @@ function mostrarResultados() {
 }
 
 function agregarPartido() {
-  const equipo1 = document.getElementById('equipo1').value;
-  const equipo2 = document.getElementById('equipo2').value;
-  const resultado = document.getElementById('resultado').value;
+  const fecha = document.getElementById('fecha').value;
+  const equipo1 = document.getElementById('equipo1').value.trim();
+  const equipo2 = document.getElementById('equipo2').value.trim();
+  const resultado = document.getElementById('resultado').value.trim();
   const goleadores = document.getElementById('goleadores').value.split(',').map(g => g.trim()).filter(g => g);
   const amarillas = parseInt(document.getElementById('amarillas').value);
   const rojas = parseInt(document.getElementById('rojas').value);
   const fairPlay = parseInt(document.getElementById('fairPlay').value);
-
-  if (equipo1 && equipo2 && resultado && !isNaN(amarillas) && !isNaN(rojas) && !isNaN(fairPlay)) {
-    partidos.push({
-      equipo1,
-      equipo2,
-      resultado,
-      goleadores,
-      tarjetas: { amarillas, rojas },
-      fairPlay
-    });
-
-    localStorage.setItem('partidos', JSON.stringify(partidos));
-    mostrarResultados();
-    document.querySelectorAll('.form-container input').forEach(input => input.value = '');
-    mostrarMensaje("¡Carga realizada con éxito!");
-  } else {
+  
+  if (!fecha || !equipo1 || !equipo2 || isNaN(amarillas) || isNaN(rojas) || isNaN(fairPlay)) {
     alert('Por favor, complete todos los campos correctamente.');
+    return;
   }
+  
+  partidos.push({ fecha, equipo1, equipo2, resultado, goleadores, tarjetas: { amarillas, rojas }, fairPlay });
+  localStorage.setItem('partidos', JSON.stringify(partidos));
+  mostrarResultados();
 }
 
 function eliminarPartido(index) {
-  if (confirm("¿Estás seguro de que querés eliminar este partido?")) {
-    partidos.splice(index, 1);
-    localStorage.setItem('partidos', JSON.stringify(partidos));
-    mostrarResultados();
-    mostrarMensaje("Partido eliminado correctamente.");
-  }
+  partidos.splice(index, 1);
+  localStorage.setItem('partidos', JSON.stringify(partidos));
+  mostrarResultados();
 }
 
-function mostrarMensaje(mensaje) {
-  const mensajeDiv = document.createElement('div');
-  mensajeDiv.classList.add('mensaje-exito');
-  mensajeDiv.textContent = mensaje;
-  document.body.appendChild(mensajeDiv);
+function filtrarPorFecha() {
+  const fecha = document.getElementById('filtroFecha').value;
+  const filtrados = partidos.filter(p => p.fecha === fecha);
+  mostrarResultados(filtrados);
+}
 
-  setTimeout(() => {
-    mensajeDiv.remove();
-  }, 3000);
+function filtrarPorGoleador() {
+  const goleador = document.getElementById('filtroGoleador').value.trim();
+  const filtrados = partidos.filter(p => p.goleadores.includes(goleador));
+  mostrarResultados(filtrados);
 }
 
 mostrarResultados();

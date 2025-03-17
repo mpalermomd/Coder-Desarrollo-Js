@@ -13,7 +13,7 @@ h1 {
   color: #333;
 }
 
-.form-container {
+.form-container, .filters {
   margin-bottom: 20px;
   padding: 20px;
   background: #fff;
@@ -24,7 +24,9 @@ h1 {
 }
 
 .form-container input,
-.form-container button {
+.filters input,
+.form-container button,
+.filters button {
   width: 100%;
   padding: 10px;
   margin: 10px 0;
@@ -62,18 +64,7 @@ h1 {
   font-weight: bold;
   color: #000;
 }
-.mensaje-exito {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background-color: #4caf50;
-  color: white;
-  padding: 15px 20px;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  font-weight: bold;
-  z-index: 1000;
-}
+
 .btn-eliminar {
   display: inline-block;
   margin-top: 10px;
@@ -88,4 +79,17 @@ h1 {
 
 .btn-eliminar:hover {
   background-color: #d32f2f;
+}
+
+.mensaje-exito {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #4caf50;
+  color: white;
+  padding: 15px 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  font-weight: bold;
+  z-index: 1000;
 }
