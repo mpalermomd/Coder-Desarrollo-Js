@@ -8,25 +8,21 @@
 
 
 
-// Recuperar equipos y partidos desde localStorage o inicializar vacío
+// Recuperar datos almacenados o inicializar vacíos
 const equipos = JSON.parse(localStorage.getItem('equipos')) || [];
 const partidos = JSON.parse(localStorage.getItem('partidos')) || [];
 
 // Actualizar los select de equipos dinámicamente
 function actualizarSelectEquipos() {
-    const selects = document.querySelectorAll('.select-equipo');
-    selects.forEach(select => {
+    document.querySelectorAll('.select-equipo').forEach(select => {
         select.innerHTML = '<option value="">Seleccione equipo</option>';
         equipos.forEach(equipo => {
-            const option = document.createElement('option');
-            option.value = equipo;
-            option.textContent = equipo;
-            select.appendChild(option);
+            select.innerHTML += `<option value="${equipo}">${equipo}</option>`;
         });
     });
 }
 
-// Agregar un nuevo equipo a la base de datos
+// Agregar un nuevo equipo
 function agregarEquipo() {
     const nombreEquipo = document.getElementById('nombreEquipo').value.trim();
     if (nombreEquipo && !equipos.includes(nombreEquipo)) {
@@ -50,8 +46,8 @@ function mostrarResultados(filtrados = partidos) {
         card.classList.add('card');
         card.innerHTML = `
             <h2>${partido.fecha} - ${partido.equipo1} vs ${partido.equipo2}</h2>
-            <p class="stat"><strong>Resultado:</strong> ${partido.resultado}</p>
-            <p class="stat"><strong>Goleadores:</strong> ${
+            <p><strong>Resultado:</strong> ${partido.resultado}</p>
+            <p><strong>Goleadores:</strong> ${
                 partido.goleadores.length > 0 
                     ? partido.goleadores.map(g => `${g.nombre} (${g.equipo}, ${g.goles} goles)`).join(', ') 
                     : 'Ninguno'
@@ -60,9 +56,11 @@ function mostrarResultados(filtrados = partidos) {
         `;
         contenedor.appendChild(card);
     });
+
+    actualizarFechasDisponibles();
 }
 
-// Agregar un partido a la base de datos
+// Agregar un partido
 function agregarPartido() {
     const fecha = document.getElementById('fecha').value;
     const equipo1 = document.getElementById('equipo1').value;
@@ -89,10 +87,11 @@ function agregarPartido() {
     localStorage.setItem('partidos', JSON.stringify(partidos));
 
     mostrarResultados();
+    mostrarTablaPosiciones();
     mostrarMensaje("¡Partido agregado con éxito!");
 }
 
-// Agregar un campo de goleador dinámicamente
+// Agregar un goleador
 function agregarGoleador() {
     const goleadorDiv = document.createElement('div');
     goleadorDiv.classList.add('goleador');
@@ -106,32 +105,42 @@ function agregarGoleador() {
     actualizarSelectEquipos();
 }
 
-// Eliminar un partido
-function eliminarPartido(index) {
-    if (confirm("¿Eliminar este partido?")) {
-        partidos.splice(index, 1);
-        localStorage.setItem('partidos', JSON.stringify(partidos));
-        mostrarResultados();
-        mostrarMensaje("Partido eliminado correctamente.");
-    }
-}
-
-// Filtrar partidos por fecha
+// Filtrar por fecha
 function filtrarPorFecha() {
     const fecha = document.getElementById('filtroFecha').value;
-    const filtrados = partidos.filter(p => p.fecha === fecha);
+    const filtrados = fecha ? partidos.filter(p => p.fecha === fecha) : partidos;
     mostrarResultados(filtrados);
+    mostrarTablaPosiciones();
 }
 
-// Mostrar mensajes de éxito
-function mostrarMensaje(mensaje) {
-    const mensajeDiv = document.createElement('div');
-    mensajeDiv.classList.add('mensaje-exito');
-    mensajeDiv.textContent = mensaje;
-    document.body.appendChild(mensajeDiv);
-    setTimeout(() => mensajeDiv.remove(), 3000);
+// Actualizar las fechas disponibles para filtrar
+function actualizarFechasDisponibles() {
+    const filtroFecha = document.getElementById('filtroFecha');
+    filtroFecha.innerHTML = '<option value="">Mostrar todas</option>';
+    const fechasUnicas = [...new Set(partidos.map(p => p.fecha))];
+    fechasUnicas.forEach(fecha => {
+        filtroFecha.innerHTML += `<option value="${fecha}">${fecha}</option>`;
+    });
 }
 
-// Inicializar la aplicación
+// Mostrar tabla de posiciones
+function mostrarTablaPosiciones() {
+    const tabla = {};
+    partidos.forEach(partido => {
+        const [goles1, goles2] = partido.resultado.split('-').map(Number);
+        if (!tabla[partido.equipo1]) tabla[partido.equipo1] = { ganados: 0 };
+        if (!tabla[partido.equipo2]) tabla[partido.equipo2] = { ganados: 0 };
+
+        if (goles1 > goles2) tabla[partido.equipo1].ganados++;
+        else if (goles2 > goles1) tabla[partido.equipo2].ganados++;
+    });
+
+    const contenedor = document.getElementById('tablaPosiciones');
+    contenedor.innerHTML = "<h3>Tabla de Posiciones</h3>";
+    Object.entries(tabla).sort((a, b) => b[1].ganados - a[1].ganados)
+        .forEach(([equipo, stats]) => contenedor.innerHTML += `<p>${equipo}: ${stats.ganados} ganados</p>`);
+}
+
+// Inicializar
 actualizarSelectEquipos();
 mostrarResultados();

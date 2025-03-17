@@ -24,9 +24,10 @@
     <div id="goleadores-container"></div>
     <button onclick="agregarGoleador()">+ Agregar Goleador</button>
 
-    <h2>Filtrar por Fecha</h2>
-    <input type="date" id="filtroFecha">
-    <button onclick="filtrarPorFecha()">Filtrar</button>
+    <h2>Fechas disponibles</h2>
+    <select id="filtroFecha" onchange="filtrarPorFecha()">
+        <option value="">Mostrar todas</option>
+    </select>
 
     <h2>Resultados</h2>
     <div id="resultados"></div>
