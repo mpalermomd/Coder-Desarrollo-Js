@@ -6,7 +6,6 @@
 *-Usar algún ciclo 
 * */
 
-
 const equipos = JSON.parse(localStorage.getItem('equipos')) || [];
 const partidos = JSON.parse(localStorage.getItem('partidos')) || [];
 
@@ -49,8 +48,8 @@ function mostrarResultados(filtrados = partidos) {
         contenedor.appendChild(card);
     });
 
-    actualizarFechasDisponibles();
     mostrarGoleadoresPorFecha();
+    mostrarTablaPosiciones();
 }
 
 // Agregar un partido
@@ -80,7 +79,6 @@ function agregarPartido() {
     localStorage.setItem('partidos', JSON.stringify(partidos));
 
     mostrarResultados();
-    mostrarTablaPosiciones();
 }
 
 // Agregar un goleador
@@ -117,18 +115,18 @@ function filtrarPorFecha() {
     const fecha = document.getElementById('filtroFecha').value;
     const filtrados = fecha ? partidos.filter(p => p.fecha === fecha) : partidos;
     mostrarResultados(filtrados);
-    mostrarGoleadoresPorFecha();
-    mostrarTablaPosiciones();
 }
 
 // Mostrar tabla de posiciones
 function mostrarTablaPosiciones() {
     const tabla = {};
+
+    equipos.forEach(equipo => {
+        tabla[equipo] = { ganados: 0 };
+    });
+
     partidos.forEach(partido => {
         const [goles1, goles2] = partido.resultado.split('-').map(Number);
-        if (!tabla[partido.equipo1]) tabla[partido.equipo1] = { ganados: 0 };
-        if (!tabla[partido.equipo2]) tabla[partido.equipo2] = { ganados: 0 };
-
         if (goles1 > goles2) tabla[partido.equipo1].ganados++;
         else if (goles2 > goles1) tabla[partido.equipo2].ganados++;
     });
