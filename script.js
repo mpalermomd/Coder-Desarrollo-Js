@@ -26,8 +26,6 @@ function agregarEquipo() {
         equipos.push(nombreEquipo);
         localStorage.setItem('equipos', JSON.stringify(equipos));
         actualizarSelectEquipos();
-    } else {
-        alert("Ingrese un nombre válido y no repetido.");
     }
     document.getElementById('nombreEquipo').value = "";
 }
@@ -70,14 +68,10 @@ function agregarPartido() {
         }
     });
 
-    if (!fecha || !equipo1 || !equipo2 || equipo1 === equipo2) {
-        alert('Por favor, complete los datos correctamente.');
-        return;
-    }
-
     partidos.push({ fecha, equipo1, equipo2, resultado, goleadores });
     localStorage.setItem('partidos', JSON.stringify(partidos));
 
+    actualizarFiltroFechas();
     mostrarResultados();
 }
 
@@ -95,21 +89,6 @@ function agregarGoleador() {
     actualizarSelectEquipos();
 }
 
-// Mostrar los goleadores por fecha
-function mostrarGoleadoresPorFecha() {
-    const fecha = document.getElementById('filtroFecha').value;
-    const filtrados = fecha ? partidos.filter(p => p.fecha === fecha) : partidos;
-
-    const contenedor = document.getElementById('goleadoresFecha');
-    contenedor.innerHTML = "<h3>Goleadores</h3>";
-
-    filtrados.forEach(partido => {
-        partido.goleadores.forEach(goleador => {
-            contenedor.innerHTML += `<p>${goleador.nombre} (${goleador.equipo}): ${goleador.goles} goles</p>`;
-        });
-    });
-}
-
 // Filtrar por fecha
 function filtrarPorFecha() {
     const fecha = document.getElementById('filtroFecha').value;
@@ -117,26 +96,17 @@ function filtrarPorFecha() {
     mostrarResultados(filtrados);
 }
 
-// Mostrar tabla de posiciones
-function mostrarTablaPosiciones() {
-    const tabla = {};
-
-    equipos.forEach(equipo => {
-        tabla[equipo] = { ganados: 0 };
+// Actualizar filtro de fechas
+function actualizarFiltroFechas() {
+    const filtroFecha = document.getElementById('filtroFecha');
+    const fechas = [...new Set(partidos.map(p => p.fecha))];
+    filtroFecha.innerHTML = `<option value="">Mostrar todas</option>`;
+    fechas.forEach(fecha => {
+        filtroFecha.innerHTML += `<option value="${fecha}">${fecha}</option>`;
     });
-
-    partidos.forEach(partido => {
-        const [goles1, goles2] = partido.resultado.split('-').map(Number);
-        if (goles1 > goles2) tabla[partido.equipo1].ganados++;
-        else if (goles2 > goles1) tabla[partido.equipo2].ganados++;
-    });
-
-    const contenedor = document.getElementById('tablaPosiciones');
-    contenedor.innerHTML = "<h3>Tabla de Posiciones</h3>";
-    Object.entries(tabla).sort((a, b) => b[1].ganados - a[1].ganados)
-        .forEach(([equipo, stats]) => contenedor.innerHTML += `<p>${equipo}: ${stats.ganados} ganados</p>`);
 }
 
 // Inicializar
 actualizarSelectEquipos();
+actualizarFiltroFechas();
 mostrarResultados();

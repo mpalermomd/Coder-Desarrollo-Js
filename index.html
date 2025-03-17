@@ -9,35 +9,47 @@
 <body>
     <h1>Gestión de Partidos</h1>
 
-    <h2>Agregar Equipo</h2>
-    <input type="text" id="nombreEquipo" placeholder="Nombre del equipo">
-    <button onclick="agregarEquipo()">Agregar Equipo</button>
+    <div class="form-container">
+        <h2>Agregar Equipo</h2>
+        <input type="text" id="nombreEquipo" placeholder="Nombre del equipo">
+        <button onclick="agregarEquipo()">Agregar Equipo</button>
+    </div>
 
-    <h2>Agregar Partido</h2>
-    <input type="date" id="fecha">
-    <select id="equipo1" class="select-equipo"></select>
-    <select id="equipo2" class="select-equipo"></select>
-    <input type="text" id="resultado" placeholder="Ej: 2-1">
+    <div class="form-container">
+        <h2>Agregar Partido</h2>
+        <input type="date" id="fecha">
+        <select id="equipo1" class="select-equipo"></select>
+        <select id="equipo2" class="select-equipo"></select>
+        <input type="text" id="resultado" placeholder="Ej: 2-1">
 
-    <h3>Goleadores</h3>
-    <div id="goleadores-container"></div>
-    <button onclick="agregarGoleador()">+ Agregar Goleador</button>
+        <h3>Goleadores</h3>
+        <div id="goleadores-container"></div>
+        <button onclick="agregarGoleador()">+ Agregar Goleador</button>
 
-    <button onclick="agregarPartido()">Agregar Partido</button>
+        <button onclick="agregarPartido()">Agregar Partido</button>
+    </div>
 
-    <h2>Filtrar por Fecha</h2>
-    <select id="filtroFecha" onchange="filtrarPorFecha()">
-        <option value="">Mostrar todas</option>
-    </select>
+    <div class="form-container">
+        <h2>Filtrar por Fecha</h2>
+        <select id="filtroFecha" onchange="filtrarPorFecha()">
+            <option value="">Mostrar todas</option>
+        </select>
+    </div>
 
-    <h2>Resultados</h2>
-    <div id="resultados"></div>
+    <div class="resultados-container">
+        <h2>Resultados</h2>
+        <div id="resultados"></div>
+    </div>
 
-    <h2>Goleadores por Fecha</h2>
-    <div id="goleadoresFecha"></div>
+    <div class="resultados-container">
+        <h2>Goleadores por Fecha</h2>
+        <div id="goleadoresFecha"></div>
+    </div>
 
-    <h2>Tabla de Posiciones</h2>
-    <div id="tablaPosiciones"></div>
+    <div class="resultados-container">
+        <h2>Tabla de Posiciones</h2>
+        <div id="tablaPosiciones"></div>
+    </div>
 
     <script src="script.js"></script>
 </body>
