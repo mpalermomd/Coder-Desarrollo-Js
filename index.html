@@ -1,55 +1,39 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Resultados de Partidos</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Partidos</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Resultados de Partidos</h1>
+    <h1>Gestión de Partidos</h1>
 
-  <!-- Formulario para agregar partidos -->
-  <div class="form-container">
-    <h2>Agregar nuevo partido</h2>
-    <input type="date" id="fecha" required>
-    <input type="text" id="equipo1" placeholder="Equipo 1" required>
-    <input type="text" id="equipo2" placeholder="Equipo 2" required>
-    <input type="text" id="resultado" placeholder="Resultado (ej: 2-1)" required>
+    <h2>Agregar Equipo</h2>
+    <input type="text" id="nombreEquipo" placeholder="Nombre del equipo">
+    <button onclick="agregarEquipo()">Agregar Equipo</button>
 
-    <!-- Campo para agregar goleadores -->
-    <div id="goleadores-container">
-      <h3>Goleadores</h3>
-      <div class="goleador">
-        <input type="text" placeholder="Nombre del Jugador" class="nombre-goleador">
-        <select class="equipo-goleador">
-          <option value="">Seleccione equipo</option>
-        </select>
-        <input type="number" placeholder="Cantidad de Goles" min="1" class="cantidad-goles">
-        <button onclick="agregarGoleador()">+</button>
-      </div>
-    </div>
-
-    <input type="number" id="amarillas" placeholder="Tarjetas Amarillas" min="0" required>
-    <input type="number" id="rojas" placeholder="Tarjetas Rojas" min="0" required>
-    <input type="number" id="fairPlay" placeholder="Fair Play (1-10)" min="1" max="10" required>
+    <h2>Agregar Partido</h2>
+    <input type="date" id="fecha">
+    <select id="equipo1" class="select-equipo"></select>
+    <select id="equipo2" class="select-equipo"></select>
+    <input type="text" id="resultado" placeholder="Resultado (Ej: 2-1)">
     <button onclick="agregarPartido()">Agregar Partido</button>
-  </div>
 
-  <!-- Filtros para visualizar resultados -->
-  <div class="filtros">
-    <h2>Filtrar Resultados</h2>
+    <h2>Goleadores</h2>
+    <div id="goleadores-container"></div>
+    <button onclick="agregarGoleador()">+ Agregar Goleador</button>
+
+    <h2>Filtrar por Fecha</h2>
     <input type="date" id="filtroFecha">
-    <button onclick="filtrarPorFecha()">Filtrar por Fecha</button>
-  </div>
+    <button onclick="filtrarPorFecha()">Filtrar</button>
 
-  <!-- Contenedor de resultados -->
-  <div class="card-container" id="resultados"></div>
+    <h2>Resultados</h2>
+    <div id="resultados"></div>
 
-  <!-- Tabla de posiciones -->
-  <div id="tablaPosiciones" class="tabla-container"></div>
+    <h2>Tabla de Posiciones</h2>
+    <div id="tablaPosiciones"></div>
 
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
-
