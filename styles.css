@@ -26,7 +26,8 @@ h1 {
 .form-container input,
 .filtros input,
 .form-container button,
-.filtros button {
+.filtros button,
+.equipo-goleador {
   width: 100%;
   padding: 10px;
   margin: 10px 0;

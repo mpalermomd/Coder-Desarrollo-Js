@@ -9,27 +9,44 @@
 <body>
   <h1>Resultados de Partidos</h1>
 
+  <!-- Formulario para agregar partidos -->
   <div class="form-container">
     <h2>Agregar nuevo partido</h2>
     <input type="date" id="fecha" required>
     <input type="text" id="equipo1" placeholder="Equipo 1" required>
     <input type="text" id="equipo2" placeholder="Equipo 2" required>
-    <input type="text" id="resultado" placeholder="Resultado (e.g., 2 - 1)" required>
-    <input type="text" id="goleadores" placeholder="Goleadores (Nombre - Equipo, separados por comas)" required>
+    <input type="text" id="resultado" placeholder="Resultado (ej: 2-1)" required>
+
+    <!-- Campo para agregar goleadores -->
+    <div id="goleadores-container">
+      <h3>Goleadores</h3>
+      <div class="goleador">
+        <input type="text" placeholder="Nombre del Jugador" class="nombre-goleador">
+        <select class="equipo-goleador">
+          <option value="">Seleccione equipo</option>
+        </select>
+        <input type="number" placeholder="Cantidad de Goles" min="1" class="cantidad-goles">
+        <button onclick="agregarGoleador()">+</button>
+      </div>
+    </div>
+
     <input type="number" id="amarillas" placeholder="Tarjetas Amarillas" min="0" required>
     <input type="number" id="rojas" placeholder="Tarjetas Rojas" min="0" required>
     <input type="number" id="fairPlay" placeholder="Fair Play (1-10)" min="1" max="10" required>
     <button onclick="agregarPartido()">Agregar Partido</button>
   </div>
 
+  <!-- Filtros para visualizar resultados -->
   <div class="filtros">
     <h2>Filtrar Resultados</h2>
     <input type="date" id="filtroFecha">
     <button onclick="filtrarPorFecha()">Filtrar por Fecha</button>
   </div>
 
+  <!-- Contenedor de resultados -->
   <div class="card-container" id="resultados"></div>
 
+  <!-- Tabla de posiciones -->
   <div id="tablaPosiciones" class="tabla-container"></div>
 
   <script src="script.js"></script>
