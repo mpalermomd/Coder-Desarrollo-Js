@@ -1,48 +1,39 @@
 body {
-  background-color: #f8f9fa;
   font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
+  padding: 20px;
 }
+
 .container {
   max-width: 800px;
+  margin: auto;
   background: white;
   padding: 20px;
-  border-radius: 10px;
+  border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-.card {
-  border-radius: 8px;
-  padding: 15px;
-  background: #ffffff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+h1 {
+  color: #343a40;
 }
+
+.formulario {
+  background: #e9ecef;
+  padding: 15px;
+  border-radius: 5px;
+}
+
 button {
   width: 100%;
 }
-input {
-  margin-bottom: 10px;
-}
-video, img {
-  max-width: 100%;
-  border-radius: 8px;
-}
-#galeria div {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
 
-/* Mejora en la disposición de los elementos */
 #resultados .card {
-  margin-top: 10px;
-  padding: 15px;
+  background: #f1f1f1;
+  padding: 10px;
+  border-radius: 5px;
 }
 
-/* Estilo para mejorar la visibilidad de las secciones */
-h2 {
-  background: #007bff;
-  color: white;
-  padding: 10px;
-  text-align: center;
+#galeria img, #galeria video {
+  margin-right: 10px;
   border-radius: 5px;
 }
