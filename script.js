@@ -7,10 +7,11 @@
 * */
 
 document.addEventListener("DOMContentLoaded", function () {
-    mostrarPartidos();
-    mostrarGaleria();
+    mostrarPartidos(); // Muestra los partidos guardados al cargar la página
+    mostrarGaleria();  // Muestra la galería de imágenes y videos guardados
 });
 
+// Función para agregar un nuevo partido al almacenamiento local
 function agregarPartido() {
     let equipo1 = document.getElementById("equipo1").value;
     let equipo2 = document.getElementById("equipo2").value;
@@ -20,10 +21,10 @@ function agregarPartido() {
     let rojas = document.getElementById("rojas").value;
     let fairPlay = document.getElementById("fairPlay").value;
 
-    let partidos = JSON.parse(localStorage.getItem("partidos")) || [];
+    let partidos = JSON.parse(localStorage.getItem("partidos")) || []; // Recupera partidos guardados o inicializa un array vacío
     let nuevoPartido = { equipo1, equipo2, resultado, goleadores, amarillas, rojas, fairPlay };
     partidos.push(nuevoPartido);
-    localStorage.setItem("partidos", JSON.stringify(partidos));
+    localStorage.setItem("partidos", JSON.stringify(partidos)); // Guarda el nuevo partido en localStorage
 
     Swal.fire({
         title: "¡Éxito!",
@@ -31,9 +32,10 @@ function agregarPartido() {
         icon: "success"
     });
 
-    mostrarPartidos();
+    mostrarPartidos(); // Actualiza la lista de partidos en pantalla
 }
 
+// Función para mostrar los partidos guardados en localStorage
 function mostrarPartidos() {
     let partidos = JSON.parse(localStorage.getItem("partidos")) || [];
     let resultadosDiv = document.getElementById("resultados");
@@ -53,6 +55,7 @@ function mostrarPartidos() {
     });
 }
 
+// Función para eliminar un partido de la lista
 function eliminarPartido(index) {
     let partidos = JSON.parse(localStorage.getItem("partidos")) || [];
     partidos.splice(index, 1);
@@ -61,6 +64,7 @@ function eliminarPartido(index) {
     Swal.fire("Eliminado", "El partido ha sido eliminado.", "warning");
 }
 
+// Función para subir archivos a la galería (imágenes y videos)
 function subirArchivo() {
     let archivoInput = document.getElementById("archivoGaleria");
     let archivo = archivoInput.files[0];
@@ -78,6 +82,7 @@ function subirArchivo() {
     }
 }
 
+// Función para mostrar la galería de imágenes y videos
 function mostrarGaleria() {
     let galeria = JSON.parse(localStorage.getItem("galeria")) || [];
     let galeriaDiv = document.getElementById("galeria");
@@ -91,5 +96,11 @@ function mostrarGaleria() {
     });
 }
 
+// Función para redirigir a la página de resultados
+function irAPaginaResultados() {
+    window.location.href = "resultados.html";
+}
+
+// Carga inicial de los datos almacenados
 mostrarPartidos();
 mostrarGaleria();
