@@ -6,107 +6,117 @@
 *-Usar algún ciclo 
 * */
 
-const equipos = JSON.parse(localStorage.getItem('equipos')) || [];
-const partidos = JSON.parse(localStorage.getItem('partidos')) || [];
+let partidos = JSON.parse(localStorage.getItem('partidos')) || [];
+let galeria = JSON.parse(localStorage.getItem('galeria')) || [];
 
-// Actualizar los select de equipos dinámicamente
-function actualizarSelectEquipos() {
-    document.querySelectorAll('.select-equipo').forEach(select => {
-        select.innerHTML = '<option value="">Seleccione equipo</option>';
-        equipos.forEach(equipo => {
-            select.innerHTML += `<option value="${equipo}">${equipo}</option>`;
-        });
-    });
-}
-
-// Agregar un nuevo equipo
-function agregarEquipo() {
-    const nombreEquipo = document.getElementById('nombreEquipo').value.trim();
-    if (nombreEquipo && !equipos.includes(nombreEquipo)) {
-        equipos.push(nombreEquipo);
-        localStorage.setItem('equipos', JSON.stringify(equipos));
-        actualizarSelectEquipos();
+function encodeImageFileAsURL(input, previewId, callback) {
+    const file = input.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onloadend = function () {
+            document.getElementById(previewId).src = reader.result;
+            document.getElementById(previewId).style.display = 'block';
+            callback(reader.result);
+        };
+        reader.readAsDataURL(file);
     }
-    document.getElementById('nombreEquipo').value = "";
 }
 
-// Mostrar partidos guardados
-function mostrarResultados(filtrados = partidos) {
-    const contenedor = document.getElementById('resultados');
-    contenedor.innerHTML = ""; 
+document.getElementById('escudo1').addEventListener('change', function () {
+    encodeImageFileAsURL(this, 'previewEscudo1', (base64) => {});
+});
 
-    filtrados.forEach(partido => {
+document.getElementById('escudo2').addEventListener('change', function () {
+    encodeImageFileAsURL(this, 'previewEscudo2', (base64) => {});
+});
+
+document.getElementById('fotoGoleador').addEventListener('change', function () {
+    encodeImageFileAsURL(this, 'previewFotoGoleador', (base64) => {});
+});
+
+function agregarPartido() {
+    const equipo1 = document.getElementById('equipo1').value;
+    const equipo2 = document.getElementById('equipo2').value;
+    const resultado = document.getElementById('resultado').value;
+    const goleadores = document.getElementById('goleadores').value.split(',').map(g => g.trim()).filter(g => g);
+    const amarillas = parseInt(document.getElementById('amarillas').value);
+    const rojas = parseInt(document.getElementById('rojas').value);
+    const fairPlay = parseInt(document.getElementById('fairPlay').value);
+    const escudo1 = document.getElementById('previewEscudo1').src;
+    const escudo2 = document.getElementById('previewEscudo2').src;
+    const fotoGoleador = document.getElementById('previewFotoGoleador').src;
+
+    if (equipo1 && equipo2 && resultado && !isNaN(amarillas) && !isNaN(rojas) && !isNaN(fairPlay)) {
+        partidos.push({
+            equipo1, equipo2, resultado, goleadores, fotoGoleador,
+            tarjetas: { amarillas, rojas }, fairPlay, escudo1, escudo2
+        });
+
+        localStorage.setItem('partidos', JSON.stringify(partidos));
+        mostrarResultados();
+        Swal.fire("¡Carga realizada con éxito!", "", "success");
+    } else {
+        alert('Complete todos los campos correctamente.');
+    }
+}
+
+function mostrarResultados() {
+    const contenedor = document.getElementById('resultados');
+    contenedor.innerHTML = "";
+    partidos.forEach((partido, index) => {
         const card = document.createElement('div');
         card.classList.add('card');
         card.innerHTML = `
-            <h2>${partido.fecha} - ${partido.equipo1} vs ${partido.equipo2}</h2>
-            <p><strong>Resultado:</strong> ${partido.resultado}</p>
-            <p><strong>Goleadores:</strong> ${partido.goleadores.map(g => `${g.nombre} (${g.equipo}) - ${g.goles} goles`).join(', ') || 'Ninguno'}</p>
+            <h2>
+                <img src="${partido.escudo1}" class="preview-img"> ${partido.equipo1} vs ${partido.equipo2}
+                <img src="${partido.escudo2}" class="preview-img">
+            </h2>
+            <p>Resultado: ${partido.resultado}</p>
+            <p>Goleadores: ${partido.goleadores.join(', ') || 'Ninguno'}</p>
+            ${partido.fotoGoleador ? `<img src="${partido.fotoGoleador}" class="preview-img">` : ""}
+            <p>Tarjetas: ${partido.tarjetas.amarillas} amarillas, ${partido.tarjetas.rojas} rojas</p>
+            <p>Fair Play: ${partido.fairPlay}/10</p>
+            <button class="btn-eliminar" onclick="eliminarPartido(${index})">Eliminar</button>
         `;
         contenedor.appendChild(card);
     });
-
-    mostrarGoleadoresPorFecha();
-    mostrarTablaPosiciones();
 }
 
-// Agregar un partido
-function agregarPartido() {
-    const fecha = document.getElementById('fecha').value;
-    const equipo1 = document.getElementById('equipo1').value;
-    const equipo2 = document.getElementById('equipo2').value;
-    const resultado = document.getElementById('resultado').value.trim();
-
-    const goleadores = [];
-    document.querySelectorAll('.goleador').forEach(goleadorDiv => {
-        const nombre = goleadorDiv.querySelector('.nombre-goleador').value.trim();
-        const equipo = goleadorDiv.querySelector('.equipo-goleador').value;
-        const goles = parseInt(goleadorDiv.querySelector('.cantidad-goles').value) || 0;
-
-        if (nombre && equipo && goles > 0) {
-            goleadores.push({ nombre, equipo, goles });
+function eliminarPartido(index) {
+    Swal.fire({
+        title: "¿Eliminar partido?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            partidos.splice(index, 1);
+            localStorage.setItem('partidos', JSON.stringify(partidos));
+            mostrarResultados();
+            Swal.fire("Eliminado", "", "success");
         }
     });
-
-    partidos.push({ fecha, equipo1, equipo2, resultado, goleadores });
-    localStorage.setItem('partidos', JSON.stringify(partidos));
-
-    actualizarFiltroFechas();
-    mostrarResultados();
 }
 
-// Agregar un goleador
-function agregarGoleador() {
-    const goleadorDiv = document.createElement('div');
-    goleadorDiv.classList.add('goleador');
-    goleadorDiv.innerHTML = `
-        <input type="text" placeholder="Nombre del Jugador" class="nombre-goleador">
-        <select class="equipo-goleador select-equipo"></select>
-        <input type="number" placeholder="Goles" min="1" class="cantidad-goles">
-        <button onclick="this.parentElement.remove()">-</button>
-    `;
-    document.getElementById('goleadores-container').appendChild(goleadorDiv);
-    actualizarSelectEquipos();
+function subirArchivo() {
+    const archivo = document.getElementById('archivoGaleria').files[0];
+    if (archivo) {
+        const reader = new FileReader();
+        reader.onloadend = function () {
+            galeria.push({ tipo: archivo.type.includes("video") ? "video" : "imagen", src: reader.result });
+            localStorage.setItem('galeria', JSON.stringify(galeria));
+            mostrarGaleria();
+        };
+        reader.readAsDataURL(archivo);
+    }
 }
 
-// Filtrar por fecha
-function filtrarPorFecha() {
-    const fecha = document.getElementById('filtroFecha').value;
-    const filtrados = fecha ? partidos.filter(p => p.fecha === fecha) : partidos;
-    mostrarResultados(filtrados);
+function mostrarGaleria() {
+    document.getElementById('galeria').innerHTML = galeria.map(item => 
+        `<${item.tipo} src="${item.src}" class="preview-img" ${item.tipo === "video" ? "controls" : ""}></${item.tipo}>`
+    ).join('');
 }
 
-// Actualizar filtro de fechas
-function actualizarFiltroFechas() {
-    const filtroFecha = document.getElementById('filtroFecha');
-    const fechas = [...new Set(partidos.map(p => p.fecha))];
-    filtroFecha.innerHTML = `<option value="">Mostrar todas</option>`;
-    fechas.forEach(fecha => {
-        filtroFecha.innerHTML += `<option value="${fecha}">${fecha}</option>`;
-    });
-}
-
-// Inicializar
-actualizarSelectEquipos();
-actualizarFiltroFechas();
 mostrarResultados();
+mostrarGaleria();
