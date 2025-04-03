@@ -1,32 +1,22 @@
+/* Estilos generales */
 body {
   font-family: Arial, sans-serif;
   background-color: #f8f9fa;
   padding: 20px;
 }
 
+/* Contenedor principal */
 .container {
   max-width: 800px;
-  margin: auto;
-  background: white;
-  padding: 20px;
+}
+
+/* Estilos para las tarjetas de partidos */
+.card {
+  background: #ffffff;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-h1, h3 {
-  color: #343a40;
-}
-
-.formulario {
-  background: #e9ecef;
-  padding: 15px;
-  border-radius: 5px;
-}
-
-button {
-  width: 100%;
-}
-
+/* Estilos para las imágenes y videos de la galería */
 #resultados .card, #galeria img, #galeria video {
   background: #f1f1f1;
   padding: 10px;
