@@ -1,87 +1,48 @@
 body {
-  font-family: Arial, sans-serif;
   background-color: #f8f9fa;
-  padding: 20px;
+  font-family: Arial, sans-serif;
 }
-
 .container {
-  max-width: 900px;
-  margin: auto;
-}
-
-.section {
-  background: #ffffff;
-  border-radius: 10px;
+  max-width: 800px;
+  background: white;
   padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-
-.section-title {
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 15px;
-  border-bottom: 2px solid #007bff;
-  padding-bottom: 5px;
-  color: #007bff;
-}
-
 .card {
-  background: #fff;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-  margin-bottom: 15px;
-}
-
-.btn {
-  border-radius: 5px;
-  margin-top: 10px;
-}
-
-#resultados, #galeria {
-  margin-top: 15px;
-}
-
-#galeria img, #galeria video {
-  max-width: 100%;
-  height: auto;
   border-radius: 8px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  background: #ffffff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+button {
+  width: 100%;
+}
+input {
   margin-bottom: 10px;
 }
-
-h1, h2 {
-  color: #343a40;
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.input-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-label {
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.video-container {
-  text-align: center;
-}
-
-.video-container video {
+video, img {
   max-width: 100%;
-  border-radius: 10px;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+#galeria div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 
-.text-center {
+/* Mejora en la disposición de los elementos */
+#resultados .card {
+  margin-top: 10px;
+  padding: 15px;
+}
+
+/* Estilo para mejorar la visibilidad de las secciones */
+h2 {
+  background: #007bff;
+  color: white;
+  padding: 10px;
   text-align: center;
+  border-radius: 5px;
 }
