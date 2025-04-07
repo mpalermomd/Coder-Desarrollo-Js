@@ -1,30 +1,15 @@
-/* Estilos generales */
+/* styles.css */
+
 body {
-  font-family: Arial, sans-serif;
   background-color: #f8f9fa;
-  padding: 20px;
 }
 
-/* Contenedor principal */
 .container {
-  max-width: 800px;
+  max-width: 900px;
 }
 
-/* Estilos para las tarjetas de partidos */
-.card {
-  background: #ffffff;
-  border-radius: 8px;
-}
-
-/* Estilos para las imágenes y videos de la galería */
-#resultados .card, #galeria img, #galeria video {
-  background: #f1f1f1;
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 10px;
-}
-
-#galeria img, #galeria video {
-  max-width: 100%;
-  border-radius: 5px;
+.card img {
+  max-height: 80px;
+  object-fit: contain;
+  margin-right: 10px;
 }
