@@ -6,106 +6,110 @@
 *-Usar algún ciclo 
 * */
 
-// script.js
-
-// ✅ Cargar partidos guardados desde localStorage
+// Obtener los partidos almacenados
 let partidos = JSON.parse(localStorage.getItem("partidos")) || [];
 
-// ✅ Agrega un nuevo partido y guarda las imágenes cargadas
+// Mostrar los partidos al cargar la página
+document.addEventListener("DOMContentLoaded", mostrarPartidos);
+
+// Función para agregar un nuevo partido
 function agregarPartido() {
-  const equipo1 = document.getElementById("equipo1").value.trim();
-  const equipo2 = document.getElementById("equipo2").value.trim();
-  const resultado = document.getElementById("resultado").value.trim();
-  const goleadores = document.getElementById("goleadores").value.trim();
-  const amarillas = document.getElementById("amarillas").value.trim();
-  const rojas = document.getElementById("rojas").value.trim();
-  const fairPlay = document.getElementById("fairPlay").value.trim();
-  const fecha = document.getElementById("fecha").value;
+    const equipo1 = document.getElementById("equipo1").value.trim();
+    const equipo2 = document.getElementById("equipo2").value.trim();
+    const resultado = document.getElementById("resultado").value.trim();
+    const goleadores = document.getElementById("goleadores").value.trim();
+    const amarillas = document.getElementById("amarillas").value.trim();
+    const rojas = document.getElementById("rojas").value.trim();
+    const fairPlay = document.getElementById("fairPlay").value.trim();
+    const fecha = document.getElementById("fecha").value;
 
-  const logo1 = document.getElementById("logoEquipo1").value;
-  const logo2 = document.getElementById("logoEquipo2").value;
-  const fotoGoleador = document.getElementById("fotoGoleador").value;
+    const fotosGoleadores = JSON.parse(document.getElementById("fotosGoleadores").value || "[]");
+    const fotosPartido = JSON.parse(document.getElementById("fotosPartido").value || "[]");
 
-  if (!equipo1 || !equipo2 || !resultado || !fecha) {
-    Swal.fire("Error", "Completá los campos obligatorios: equipos, resultado y fecha", "error");
-    return;
-  }
-
-  const partido = {
-    equipo1,
-    equipo2,
-    resultado,
-    goleadores,
-    amarillas,
-    rojas,
-    fairPlay,
-    fecha,
-    logo1,
-    logo2,
-    fotoGoleador
-  };
-
-  partidos.push(partido);
-  localStorage.setItem("partidos", JSON.stringify(partidos));
-
-  Swal.fire("Éxito", "Partido cargado correctamente", "success");
-  document.getElementById("formulario").reset();
-}
-
-// ✅ Muestra todos los partidos almacenados
-function mostrarPartidos() {
-  const resultadosDiv = document.getElementById("resultados");
-  resultadosDiv.innerHTML = "";
-
-  partidos.forEach((p, index) => {
-    resultadosDiv.innerHTML += `
-      <div class="card mb-4 p-3 shadow-sm">
-        <div class="d-flex align-items-center mb-2">
-          ${p.logo1 ? `<img src="${p.logo1}" alt="Escudo ${p.equipo1}" width="60"/>` : ""}
-          <h5 class="mx-2 mb-0">${p.equipo1}</h5>
-          <span class="mx-2">vs</span>
-          <h5 class="mb-0">${p.equipo2}</h5>
-          ${p.logo2 ? `<img src="${p.logo2}" alt="Escudo ${p.equipo2}" width="60"/>` : ""}
-        </div>
-        <p><strong>Resultado:</strong> ${p.resultado}</p>
-        <p><strong>Fecha:</strong> ${p.fecha}</p>
-        <p><strong>Goleadores:</strong> ${p.goleadores || "N/A"}</p>
-        ${p.fotoGoleador ? `<img src="${p.fotoGoleador}" alt="Foto Goleador" class="img-thumbnail" width="80"/>` : ""}
-        <p><strong>Tarjetas Amarillas:</strong> ${p.amarillas || "N/A"}</p>
-        <p><strong>Tarjetas Rojas:</strong> ${p.rojas || "N/A"}</p>
-        <p><strong>Fair Play:</strong> ${p.fairPlay || "N/A"}</p>
-        <button class="btn btn-danger" onclick="eliminarPartido(${index})">Eliminar</button>
-      </div>`;
-  });
-}
-
-// ✅ Elimina un partido de la lista
-function eliminarPartido(index) {
-  partidos.splice(index, 1);
-  localStorage.setItem("partidos", JSON.stringify(partidos));
-  mostrarPartidos();
-}
-
-// ✅ Abre el widget de Cloudinary para subir imágenes
-function subirImagen(idCampo) {
-  cloudinary.openUploadWidget({
-    cloudName: 'dv5rrlzri',
-    uploadPreset: 'Partidos',
-    sources: ['local', 'url', 'camera'],
-    multiple: false,
-    folder: 'partidos',
-    cropping: false
-  }, (error, result) => {
-    if (!error && result && result.event === "success") {
-      document.getElementById(idCampo).value = result.info.secure_url;
-      Swal.fire("Imagen subida", "La imagen se cargó correctamente", "success");
+    // Validación básica
+    if (!equipo1 || !equipo2 || !resultado || !fecha) {
+        Swal.fire("Campos incompletos", "Por favor completa todos los campos obligatorios", "warning");
+        return;
     }
-  });
+
+    const nuevoPartido = {
+        equipo1, equipo2, resultado, goleadores, amarillas, rojas, fairPlay, fecha,
+        fotosGoleadores, fotosPartido
+    };
+
+    partidos.push(nuevoPartido);
+    localStorage.setItem("partidos", JSON.stringify(partidos));
+
+    Swal.fire("Éxito", "Partido cargado correctamente", "success").then(() => {
+        document.getElementById("formulario").reset();
+        document.getElementById("previewGoleadores").innerHTML = "";
+        document.getElementById("previewPartido").innerHTML = "";
+        document.getElementById("fotosGoleadores").value = "";
+        document.getElementById("fotosPartido").value = "";
+    });
 }
 
-// ✅ Mostrar partidos al abrir partidos.html
-document.addEventListener("DOMContentLoaded", () => {
-  if (document.getElementById("resultados")) {
+// Mostrar todos los partidos en partidos.html
+function mostrarPartidos() {
+    const resultadosDiv = document.getElementById("resultados");
+    if (!resultadosDiv) return;
+
+    resultadosDiv.innerHTML = "";
+
+    partidos.forEach((partido, index) => {
+        const card = document.createElement("div");
+        card.className = "card p-3 mt-3";
+
+        card.innerHTML = `
+            <h5>${partido.equipo1} vs ${partido.equipo2}</h5>
+            <p><strong>Resultado:</strong> ${partido.resultado}</p>
+            <p><strong>Fecha:</strong> ${partido.fecha}</p>
+            <p><strong>Goleadores:</strong> ${partido.goleadores || "N/A"}</p>
+            <div class="d-flex gap-2 flex-wrap">
+                ${partido.fotosGoleadores.map(url => `<img src="${url}" class="img-thumbnail" width="60">`).join("")}
+            </div>
+            <p><strong>Amarillas:</strong> ${partido.amarillas || "N/A"}</p>
+            <p><strong>Rojas:</strong> ${partido.rojas || "N/A"}</p>
+            <p><strong>Fair Play:</strong> ${partido.fairPlay || "N/A"}</p>
+            <p><strong>Fotos del partido:</strong></p>
+            <div class="d-flex gap-2 flex-wrap">
+                ${partido.fotosPartido.map(url => `<img src="${url}" class="img-thumbnail" width="80">`).join("")}
+            </div>
+            <button class="btn btn-danger mt-2" onclick="eliminarPartido(${index})">Eliminar</button>
+        `;
+        resultadosDiv.appendChild(card);
+    });
+}
+
+// Eliminar un partido por índice
+function eliminarPartido(index) {
+    partidos.splice(index, 1);
+    localStorage.setItem("partidos", JSON.stringify(partidos));
     mostrarPartidos();
-  }
-});
+}
+
+// Función para subir múltiples imágenes a Cloudinary
+function subirMultiplesImagenes(inputId) {
+    const widget = cloudinary.createUploadWidget({
+        cloudName: 'dv5rrlzri',
+        uploadPreset: 'Partidos',
+        multiple: true,
+        maxFiles: 10
+    }, (error, result) => {
+        if (!error && result && result.event === "success") {
+            let imagenes = JSON.parse(document.getElementById(inputId).value || "[]");
+            imagenes.push(result.info.secure_url);
+            document.getElementById(inputId).value = JSON.stringify(imagenes);
+            mostrarPrevisualizacion(inputId, imagenes);
+        }
+    });
+
+    widget.open();
+}
+
+// Mostrar miniaturas de imágenes seleccionadas
+function mostrarPrevisualizacion(inputId, urls) {
+    const previewId = inputId === "fotosGoleadores" ? "previewGoleadores" : "previewPartido";
+    const previewContainer = document.getElementById(previewId);
+    previewContainer.innerHTML = urls.map(url => `<img src="${url}" width="60" class="img-thumbnail">`).join("");
+}
