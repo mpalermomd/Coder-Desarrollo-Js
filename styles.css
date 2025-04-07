@@ -1,17 +1,16 @@
 /* styles.css */
 
 body {
-  font-family: 'Segoe UI', sans-serif;
+  background-color: #f8f9fa;
 }
 
-.card img {
-  max-height: 80px;
-  object-fit: cover;
-  border: 1px solid #ccc;
+.card {
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
 }
 
-#previewGoleadores img,
-#previewPartido img {
-  height: 60px;
-  border-radius: 4px;
+img.img-thumbnail {
+  max-width: 100px;
+  height: auto;
 }
