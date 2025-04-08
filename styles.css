@@ -1,14 +1,21 @@
-img.escudo {
-  width: 60px;
-  height: 60px;
-  object-fit: contain;
-  margin-right: 10px;
+body {
+  background-color: #f8f9fa;
 }
 
-img.jugador {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 50%;
+.card img, video {
   margin: 5px;
+  border-radius: 5px;
+}
+
+#goleadoresContainer,
+#amarillasContainer,
+#rojasContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#galeria img, #galeria video {
+  max-width: 200px;
+  margin: 10px;
 }

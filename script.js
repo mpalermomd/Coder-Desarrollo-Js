@@ -8,117 +8,175 @@
 
 // script.js
 
-// Cargar la lista de partidos desde el LocalStorage o iniciar vacía
+// Obtener los datos guardados previamente en localStorage
 let partidos = JSON.parse(localStorage.getItem("partidos")) || [];
 
-// Función para agregar campos dinámicos (nombre + imagen) para jugadores
-function agregarCampoJugador(tipo) {
-    const contenedor = document.getElementById(`${tipo}Container`);
-    const div = document.createElement("div");
-    div.classList.add("input-group", "mb-2");
+// Mostrar partidos al cargar la página
+document.addEventListener("DOMContentLoaded", () => {
+    mostrarPartidos();
+});
 
-    div.innerHTML = `
-        <input type="text" class="form-control" name="${tipo}Nombre" placeholder="Nombre del jugador">
-        <input type="file" class="form-control" name="${tipo}Foto" accept="image/*">
-    `;
-    contenedor.appendChild(div);
+// Función para mostrar un spinner de carga
+function mostrarSpinner() {
+    const spinner = document.getElementById("spinnerCarga");
+    spinner.classList.remove("d-none");
 }
 
-// Función principal para agregar un nuevo partido
-function agregarPartido() {
-    // Obtener valores del formulario
-    const equipo1 = document.getElementById("equipo1").value;
-    const equipo2 = document.getElementById("equipo2").value;
-    const escudo1 = document.getElementById("escudo1").files[0];
-    const escudo2 = document.getElementById("escudo2").files[0];
-    const resultado = document.getElementById("resultado").value;
-    const fecha = document.getElementById("fecha").value;
-    const fairPlay = document.getElementById("fairPlay").value;
+// Función para ocultar el spinner
+function ocultarSpinner() {
+    const spinner = document.getElementById("spinnerCarga");
+    spinner.classList.add("d-none");
+}
 
-    // Validación básica
-    if (!equipo1 || !equipo2 || !resultado || !fecha || !escudo1 || !escudo2) {
-        Swal.fire("Error", "Debes completar todos los campos requeridos", "error");
-        return;
-    }
+// Función para agregar un partido
+function cargarPartido() {
+    mostrarSpinner(); // Mostrar spinner mientras se procesa
 
-    // Cargar imágenes a Cloudinary y continuar cuando estén listas
-    Promise.all([
-        subirACloudinary(escudo1),
-        subirACloudinary(escudo2),
-        procesarJugadores("goleador"),
-        procesarJugadores("amarilla"),
-        procesarJugadores("roja"),
-        subirRecuerdos()
-    ]).then(([escudo1Url, escudo2Url, goleadores, amarillas, rojas, recuerdos]) => {
+    setTimeout(() => {
+        const equipo1 = document.getElementById("equipo1").value;
+        const escudo1 = document.getElementById("escudo1").value;
+        const equipo2 = document.getElementById("equipo2").value;
+        const escudo2 = document.getElementById("escudo2").value;
+        const resultado = document.getElementById("resultado").value;
+        const fecha = document.getElementById("fecha").value;
+
+        const goleadores = obtenerDatosJugadores("goleadores");
+        const amarillas = obtenerDatosJugadores("amarillas");
+        const rojas = obtenerDatosJugadores("rojas");
+
+        const multimedia = JSON.parse(localStorage.getItem("recuerdos") || "[]");
+
+        if (!equipo1 || !equipo2 || !resultado || !fecha) {
+            ocultarSpinner();
+            Swal.fire("Campos incompletos", "Por favor, completá los campos obligatorios", "error");
+            return;
+        }
+
         const nuevoPartido = {
-            equipo1,
-            equipo2,
-            escudo1: escudo1Url,
-            escudo2: escudo2Url,
-            resultado,
-            fecha,
-            fairPlay,
-            goleadores,
-            amarillas,
-            rojas,
-            recuerdos
+            equipo1, escudo1, equipo2, escudo2,
+            resultado, fecha,
+            goleadores, amarillas, rojas,
+            multimedia
         };
 
         partidos.push(nuevoPartido);
         localStorage.setItem("partidos", JSON.stringify(partidos));
-        Swal.fire("Éxito", "Partido cargado correctamente", "success");
-        document.getElementById("formulario").reset();
-        limpiarCampos();
-    });
+
+        Swal.fire("¡Partido cargado!", "Los datos se guardaron correctamente.", "success");
+        limpiarFormulario();
+        mostrarPartidos();
+        ocultarSpinner();
+    }, 1000); // Simulamos una pequeña carga
 }
 
-// Subir un archivo a Cloudinary
-async function subirACloudinary(archivo) {
-    const url = "https://api.cloudinary.com/v1_1/dv5rrlzri/upload";
-    const formData = new FormData();
-    formData.append("file", archivo);
-    formData.append("upload_preset", "Partidos");
-
-    const response = await fetch(url, { method: "POST", body: formData });
-    const data = await response.json();
-    return data.secure_url;
-}
-
-// Procesar los jugadores con nombre + imagen
-async function procesarJugadores(tipo) {
-    const nombres = document.getElementsByName(`${tipo}Nombre`);
-    const fotos = document.getElementsByName(`${tipo}Foto`);
+// Obtener datos de los jugadores desde los campos dinámicos
+function obtenerDatosJugadores(tipo) {
+    const seccion = document.getElementById(`${tipo}Container`);
     const jugadores = [];
 
-    for (let i = 0; i < nombres.length; i++) {
-        const nombre = nombres[i].value;
-        const foto = fotos[i].files[0];
-        if (!nombre || !foto) continue;
-
-        const fotoUrl = await subirACloudinary(foto);
-        jugadores.push({ nombre, foto: fotoUrl });
-    }
+    seccion.querySelectorAll(".input-group").forEach(grupo => {
+        const nombre = grupo.querySelector(".nombre").value;
+        const imagen = grupo.querySelector(".imagen").value;
+        if (nombre && imagen) {
+            jugadores.push({ nombre, imagen });
+        }
+    });
 
     return jugadores;
 }
 
-// Subir los archivos de recuerdo (fotos/videos del partido)
-async function subirRecuerdos() {
-    const archivos = document.getElementById("recuerdos").files;
-    const urls = [];
+// Mostrar todos los partidos
+function mostrarPartidos() {
+    const contenedor = document.getElementById("listaPartidos");
+    if (!contenedor) return;
 
-    for (const archivo of archivos) {
-        const url = await subirACloudinary(archivo);
-        urls.push(url);
-    }
+    contenedor.innerHTML = "";
 
-    return urls;
+    partidos.forEach((partido, index) => {
+        let goleadoresHTML = partido.goleadores.map(j =>
+            `<div><strong>${j.nombre}</strong><br><img src="${j.imagen}" class="img-thumbnail" width="80"></div>`).join("");
+
+        let amarillasHTML = partido.amarillas.map(j =>
+            `<div><strong>${j.nombre}</strong><br><img src="${j.imagen}" class="img-thumbnail" width="80"></div>`).join("");
+
+        let rojasHTML = partido.rojas.map(j =>
+            `<div><strong>${j.nombre}</strong><br><img src="${j.imagen}" class="img-thumbnail" width="80"></div>`).join("");
+
+        let multimediaHTML = (partido.multimedia || []).map(m =>
+            m.type.startsWith("image") ?
+                `<img src="${m.url}" class="img-fluid rounded mt-2" width="200">` :
+                `<video src="${m.url}" controls class="mt-2" width="200"></video>`).join("");
+
+        contenedor.innerHTML += `
+            <div class="card shadow p-3 mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-center">
+                        <img src="${partido.escudo1}" class="rounded mb-2" width="60"><br>
+                        <strong>${partido.equipo1}</strong>
+                    </div>
+                    <h4>${partido.resultado}</h4>
+                    <div class="text-center">
+                        <img src="${partido.escudo2}" class="rounded mb-2" width="60"><br>
+                        <strong>${partido.equipo2}</strong>
+                    </div>
+                </div>
+                <p class="mt-2 text-muted"><strong>Fecha:</strong> ${partido.fecha}</p>
+                <div><strong>Goleadores:</strong><div class="d-flex flex-wrap gap-2">${goleadoresHTML}</div></div>
+                <div><strong>Amarillas:</strong><div class="d-flex flex-wrap gap-2">${amarillasHTML}</div></div>
+                <div><strong>Rojas:</strong><div class="d-flex flex-wrap gap-2">${rojasHTML}</div></div>
+                <div><strong>Recuerdos:</strong><div class="d-flex flex-wrap gap-2">${multimediaHTML}</div></div>
+                <button class="btn btn-danger mt-3" onclick="eliminarPartido(${index})">Eliminar</button>
+            </div>
+        `;
+    });
 }
 
-// Limpiar campos dinámicos después de cargar un partido
-function limpiarCampos() {
-    ["goleador", "amarilla", "roja"].forEach(tipo => {
-        document.getElementById(`${tipo}Container`).innerHTML = "";
+// Eliminar un partido por su índice
+function eliminarPartido(index) {
+    partidos.splice(index, 1);
+    localStorage.setItem("partidos", JSON.stringify(partidos));
+    mostrarPartidos();
+}
+
+// Agregar campos dinámicos para jugadores (goleadores, amarillas, rojas)
+function agregarJugador(tipo) {
+    const contenedor = document.getElementById(`${tipo}Container`);
+    const div = document.createElement("div");
+    div.classList.add("input-group", "mb-2");
+    div.innerHTML = `
+        <input type="text" class="form-control nombre" placeholder="Nombre del jugador">
+        <input type="text" class="form-control imagen" placeholder="URL de la imagen">
+        <button class="btn btn-outline-danger" onclick="this.parentElement.remove()">X</button>
+    `;
+    contenedor.appendChild(div);
+}
+
+// Subir archivo multimedia (foto o video) para el recuerdo
+function subirArchivoGaleria() {
+    const archivo = document.getElementById("archivoGaleria").files[0];
+    if (!archivo) {
+        Swal.fire("Error", "Seleccioná un archivo para subir", "error");
+        return;
+    }
+
+    const lector = new FileReader();
+    lector.onload = function (e) {
+        const tipo = archivo.type;
+        const multimedia = JSON.parse(localStorage.getItem("recuerdos") || "[]");
+        multimedia.push({ url: e.target.result, type: tipo });
+        localStorage.setItem("recuerdos", JSON.stringify(multimedia));
+
+        Swal.fire("¡Listo!", "Archivo de recuerdo agregado correctamente", "success");
+    };
+    lector.readAsDataURL(archivo);
+}
+
+// Limpiar campos del formulario después de cargar un partido
+function limpiarFormulario() {
+    document.getElementById("formularioPartido").reset();
+    ["goleadoresContainer", "amarillasContainer", "rojasContainer"].forEach(id => {
+        document.getElementById(id).innerHTML = "";
     });
+    localStorage.removeItem("recuerdos");
 }
 
