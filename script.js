@@ -165,3 +165,4 @@ function mostrarJugadores(titulo, lista) {
 }
 
 document.addEventListener("DOMContentLoaded", mostrarPartidos);
+
