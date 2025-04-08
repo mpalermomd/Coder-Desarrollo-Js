@@ -5,190 +5,195 @@
 *-Usar funciones 
 *-Usar algún ciclo 
 * */
-// Datos de Cloudinary
-const cloudName = "dv5rrlzri";
-const uploadPreset = "Partidos";
 
-// Lista de partidos desde LocalStorage
-let partidos = JSON.parse(localStorage.getItem("partidos")) || [];
+const cloudName = 'dv5rrlzri';
+const uploadPreset = 'Partidos';
 
-// Función para subir un archivo a Cloudinary y devolver la URL
-async function subirACloudinary(file) {
+// Subir archivo a Cloudinary
+async function subirArchivo(archivo) {
   const url = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
   const formData = new FormData();
-  formData.append("file", file);
-  formData.append("upload_preset", uploadPreset);
+  formData.append('file', archivo);
+  formData.append('upload_preset', uploadPreset);
 
-  const res = await fetch(url, {
-    method: "POST",
-    body: formData,
+  const response = await fetch(url, {
+    method: 'POST',
+    body: formData
   });
 
-  const data = await res.json();
+  const data = await response.json();
   return data.secure_url;
 }
 
-// Agregar campos dinámicos para goleadores, amarillas o rojas
+// Agregar campos dinámicos
 function agregarCampo(tipo) {
-  const contenedor = document.getElementById(tipo);
-  const div = document.createElement("div");
-  div.classList.add("input-group", "mb-2");
+  const container = document.getElementById(`${tipo}Container`);
+  const div = document.createElement('div');
+  div.classList.add('row', 'g-2', 'mb-2');
+
   div.innerHTML = `
-    <input type="text" class="form-control" placeholder="Nombre del jugador" required>
-    <input type="file" class="form-control" accept="image/*" required>
+    <div class="col-md-5">
+      <input type="text" class="form-control" placeholder="Nombre del jugador" name="${tipo}Nombre">
+    </div>
+    <div class="col-md-5">
+      <input type="file" class="form-control" accept="image/*" name="${tipo}Imagen">
+    </div>
+    <div class="col-md-2">
+      <button type="button" class="btn btn-danger w-100" onclick="eliminarCampo(this)">X</button>
+    </div>
   `;
-  contenedor.appendChild(div);
+  container.appendChild(div);
 }
 
-// Evento al cargar el formulario
-document.getElementById("formularioPartido")?.addEventListener("submit", async function (e) {
-  e.preventDefault();
-  const spinner = document.getElementById("spinner");
-  spinner.classList.remove("d-none");
+// Eliminar campo dinámico
+function eliminarCampo(boton) {
+  boton.closest('.row').remove();
+}
 
-  const equipo1 = document.getElementById("equipo1").value;
-  const equipo2 = document.getElementById("equipo2").value;
-  const resultado = document.getElementById("resultado").value;
-  const fairPlay = document.getElementById("fairPlay").value;
-  const fecha = document.getElementById("fecha").value;
+// Cargar partido
+async function cargarPartido() {
+  const equipo1 = document.getElementById('equipo1').value;
+  const equipo2 = document.getElementById('equipo2').value;
+  const resultado = document.getElementById('resultado').value;
+  const fecha = document.getElementById('fecha').value;
+  const fairPlay = document.getElementById('fairPlay').value;
+  const escudo1 = document.getElementById('escudo1').files[0];
+  const escudo2 = document.getElementById('escudo2').files[0];
+  const recuerdos = document.getElementById('recuerdos').files;
 
-  if (!equipo1 || !equipo2 || !resultado || !fecha) {
-    spinner.classList.add("d-none");
-    return Swal.fire("Error", "Completa todos los campos obligatorios", "error");
+  if (!equipo1 || !equipo2 || !resultado || !fecha || !escudo1 || !escudo2) {
+    return Swal.fire('Faltan campos obligatorios', '', 'warning');
   }
 
-  const escudo1 = document.getElementById("escudo1").files[0];
-  const escudo2 = document.getElementById("escudo2").files[0];
-  const escudo1Url = escudo1 ? await subirACloudinary(escudo1) : "";
-  const escudo2Url = escudo2 ? await subirACloudinary(escudo2) : "";
+  Swal.fire({
+    title: 'Cargando partido...',
+    allowOutsideClick: false,
+    didOpen: () => Swal.showLoading()
+  });
 
-  const goleadores = await obtenerJugadoresConImagen("goleadores");
-  const amarillas = await obtenerJugadoresConImagen("amarillas");
-  const rojas = await obtenerJugadoresConImagen("rojas");
+  const escudo1Url = await subirArchivo(escudo1);
+  const escudo2Url = await subirArchivo(escudo2);
 
-  // Subir recuerdos (imágenes/videos)
-  const galeriaArchivos = document.getElementById("galeria").files;
-  const galeriaUrls = [];
-  for (const archivo of galeriaArchivos) {
-    const url = await subirACloudinary(archivo);
-    galeriaUrls.push({ url, tipo: archivo.type.startsWith("video") ? "video" : "imagen" });
+  const cargarJugadores = async (tipo) => {
+    const nombres = document.getElementsByName(`${tipo}Nombre`);
+    const imagenes = document.getElementsByName(`${tipo}Imagen`);
+    const jugadores = [];
+
+    for (let i = 0; i < nombres.length; i++) {
+      if (nombres[i].value && imagenes[i].files.length > 0) {
+        const url = await subirArchivo(imagenes[i].files[0]);
+        jugadores.push({ nombre: nombres[i].value, imagen: url });
+      }
+    }
+    return jugadores;
+  };
+
+  const goleadores = await cargarJugadores('goleadores');
+  const amarillas = await cargarJugadores('amarillas');
+  const rojas = await cargarJugadores('rojas');
+
+  const recuerdosUrls = [];
+  for (let archivo of recuerdos) {
+    const url = await subirArchivo(archivo);
+    recuerdosUrls.push(url);
   }
 
-  const nuevoPartido = {
+  const partido = {
     equipo1,
     equipo2,
     resultado,
-    fairPlay,
     fecha,
+    fairPlay,
     escudo1Url,
     escudo2Url,
     goleadores,
     amarillas,
     rojas,
-    galeria: galeriaUrls
+    recuerdos: recuerdosUrls
   };
 
-  partidos.push(nuevoPartido);
-  localStorage.setItem("partidos", JSON.stringify(partidos));
+  const partidos = JSON.parse(localStorage.getItem('partidos')) || [];
+  partidos.push(partido);
+  localStorage.setItem('partidos', JSON.stringify(partidos));
 
-  spinner.classList.add("d-none");
-  Swal.fire("¡Éxito!", "Partido cargado correctamente", "success");
-  document.getElementById("formularioPartido").reset();
-  document.getElementById("goleadores").innerHTML = "";
-  document.getElementById("amarillas").innerHTML = "";
-  document.getElementById("rojas").innerHTML = "";
-});
-
-// Obtener nombre e imagen de jugadores de campos dinámicos
-async function obtenerJugadoresConImagen(tipo) {
-  const divs = document.getElementById(tipo).querySelectorAll(".input-group");
-  const jugadores = [];
-  for (const div of divs) {
-    const nombre = div.children[0].value;
-    const imagen = div.children[1].files[0];
-    if (nombre && imagen) {
-      const url = await subirACloudinary(imagen);
-      jugadores.push({ nombre, imagen: url });
-    }
-  }
-  return jugadores;
-}
-
-// Mostrar partidos en partidos.html
-function mostrarPartidos() {
-  const resultados = document.getElementById("resultados");
-  if (!resultados) return;
-  resultados.innerHTML = "";
-
-  partidos.forEach((partido, i) => {
-    resultados.innerHTML += `
-      <div class="card shadow-sm p-3 mb-4">
-        <div class="row align-items-center">
-          <div class="col-md-2 text-center">
-            <img src="${partido.escudo1Url}" class="img-fluid" width="80">
-            <p>${partido.equipo1}</p>
-          </div>
-          <div class="col-md-2 text-center">
-            <strong>${partido.resultado}</strong>
-            <p>${partido.fecha}</p>
-          </div>
-          <div class="col-md-2 text-center">
-            <img src="${partido.escudo2Url}" class="img-fluid" width="80">
-            <p>${partido.equipo2}</p>
-          </div>
-          <div class="col-md-6">
-            <p><strong>Fair Play:</strong> ${partido.fairPlay}</p>
-            ${mostrarJugadores("Goleadores", partido.goleadores)}
-            ${mostrarJugadores("Amarillas", partido.amarillas)}
-            ${mostrarJugadores("Rojas", partido.rojas)}
-            <button class="btn btn-danger mt-2" onclick="eliminarPartido(${i})">Eliminar</button>
-          </div>
-        </div>
-      </div>
-    `;
+  Swal.fire('Partido cargado con éxito', '', 'success').then(() => {
+    document.getElementById('formPartido').reset();
+    window.location.reload();
   });
 }
 
-// Mostrar galería
-function mostrarGaleria() {
-  const galeriaDiv = document.getElementById("galeria");
-  if (!galeriaDiv) return;
+// Mostrar partidos en partidos.html
+if (document.getElementById('listaPartidos')) {
+  const partidos = JSON.parse(localStorage.getItem('partidos')) || [];
+  const contenedor = document.getElementById('listaPartidos');
+  const galeria = document.getElementById('galeria');
 
-  galeriaDiv.innerHTML = "";
-  partidos.forEach(p => {
-    p.galeria?.forEach(media => {
-      if (media.tipo === "imagen") {
-        galeriaDiv.innerHTML += `<img src="${media.url}" class="img-thumbnail" width="200"/>`;
-      } else {
-        galeriaDiv.innerHTML += `<video src="${media.url}" controls width="200" class="rounded"></video>`;
-      }
+  partidos.forEach((p, index) => {
+    const div = document.createElement('div');
+    div.classList.add('card', 'mb-4', 'shadow');
+
+    div.innerHTML = `
+      <div class="card-body">
+        <div class="row align-items-center mb-3">
+          <div class="col-md-2 text-center">
+            <img src="${p.escudo1Url}" class="img-fluid" alt="Escudo 1">
+            <p class="fw-bold">${p.equipo1}</p>
+          </div>
+          <div class="col-md-2 text-center">
+            <img src="${p.escudo2Url}" class="img-fluid" alt="Escudo 2">
+            <p class="fw-bold">${p.equipo2}</p>
+          </div>
+          <div class="col-md-3">
+            <p><strong>Resultado:</strong> ${p.resultado}</p>
+            <p><strong>Fecha:</strong> ${p.fecha}</p>
+            <p><strong>Fair Play:</strong> ${p.fairPlay}</p>
+          </div>
+          <div class="col-md-3">
+            <p><strong>Goleadores:</strong></p>
+            ${p.goleadores.map(g => `<div><img src="${g.imagen}" class="me-2" width="40">${g.nombre}</div>`).join('')}
+          </div>
+          <div class="col-md-2">
+            <p><strong>Amarillas:</strong></p>
+            ${p.amarillas.map(a => `<div><img src="${a.imagen}" class="me-2" width="30">${a.nombre}</div>`).join('')}
+            <p><strong>Rojas:</strong></p>
+            ${p.rojas.map(r => `<div><img src="${r.imagen}" class="me-2" width="30">${r.nombre}</div>`).join('')}
+          </div>
+        </div>
+        <div class="text-end">
+          <button class="btn btn-outline-danger btn-sm" onclick="eliminarPartido(${index})">Eliminar</button>
+        </div>
+      </div>
+    `;
+    contenedor.appendChild(div);
+
+    // Galería de recuerdos
+    p.recuerdos.forEach(url => {
+      const media = document.createElement(url.includes('.mp4') ? 'video' : 'img');
+      media.src = url;
+      media.classList.add('galeria-item');
+      if (url.includes('.mp4')) media.controls = true;
+
+      const col = document.createElement('div');
+      col.classList.add('col-md-3');
+      col.appendChild(media);
+      galeria.appendChild(col);
     });
   });
 }
 
-// Mostrar jugadores con imagen
-function mostrarJugadores(titulo, lista = []) {
-  if (!lista.length) return "";
-  const items = lista.map(j => `
-    <div class="d-flex align-items-center mb-1">
-      <img src="${j.imagen}" class="rounded-circle me-2" width="30" height="30"/>
-      <span>${j.nombre}</span>
-    </div>
-  `).join("");
-  return `<p><strong>${titulo}:</strong><br>${items}</p>`;
-}
-
 // Eliminar partido
 function eliminarPartido(index) {
-  partidos.splice(index, 1);
-  localStorage.setItem("partidos", JSON.stringify(partidos));
-  mostrarPartidos();
-  mostrarGaleria();
+  Swal.fire({
+    title: '¿Eliminar este partido?',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, eliminar',
+    icon: 'warning'
+  }).then(result => {
+    if (result.isConfirmed) {
+      const partidos = JSON.parse(localStorage.getItem('partidos')) || [];
+      partidos.splice(index, 1);
+      localStorage.setItem('partidos', JSON.stringify(partidos));
+      location.reload();
+    }
+  });
 }
-
-// Ejecutar en la página de resultados
-document.addEventListener("DOMContentLoaded", () => {
-  mostrarPartidos();
-  mostrarGaleria();
-});
-
